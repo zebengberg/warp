@@ -29,81 +29,82 @@ public class TeleWARP extends LinearOpMode {
 
     BNO055IMU imu;
 
+    DcMotor big_arm_rotate;
+    DcMotor big_arm_extend;
+    Servo big_arm_thumb;
+
+
 
 
 
     @Override
     public void runOpMode() {
-        // DC MOTORS
+        // DC motors for holonomic drive.
         front_right_wheel = hardwareMap.dcMotor.get("front_right_wheel");
         front_left_wheel = hardwareMap.dcMotor.get("front_left_wheel");
         back_left_wheel = hardwareMap.dcMotor.get("back_left_wheel");
         back_right_wheel = hardwareMap.dcMotor.get("back_right_wheel");
-
-        front_left_wheel.setDirection(DcMotor.Direction.REVERSE);  // reversing all made sense
+        // Arbitrary decision to reverse all -- could instead negate powers below.
+        front_left_wheel.setDirection(DcMotor.Direction.REVERSE);
         back_left_wheel.setDirection(DcMotor.Direction.REVERSE);
         front_right_wheel.setDirection(DcMotor.Direction.REVERSE);
         back_right_wheel.setDirection(DcMotor.Direction.REVERSE);
-
         front_left_wheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         back_left_wheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         front_right_wheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         back_right_wheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        // SERVOS
+        // Servos for little arms
         left_arm = hardwareMap.servo.get("left_arm");
         right_arm = hardwareMap.servo.get("right_arm");
-
         left_arm.resetDeviceConfigurationForOpMode();
         right_arm.resetDeviceConfigurationForOpMode();
         left_arm.setDirection(Servo.Direction.FORWARD);
         right_arm.setDirection(Servo.Direction.REVERSE);
 
+        // Motors for big arm
+        big_arm_rotate = hardwareMap.dcMotor.get("big_arm_rotate");
+        big_arm_extend = hardwareMap.dcMotor.get("big_arm_extend");
+        big_arm_thumb = hardwareMap.servo.get("big_arm_thumb");
+        big_arm_thumb.resetDeviceConfigurationForOpMode();
+
         // IMU DEVICE -- possibly delete some of this.
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-
         parameters.mode                = BNO055IMU.SensorMode.IMU;
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.loggingEnabled      = false;
-
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
-        telemetry.addData("Mode", "calibrating...");
+        // Make sure the imu gyro is calibrated before continuing.
+        telemetry.addData("Status", "calibrating gyro");
         telemetry.update();
-
-        // make sure the imu gyro is calibrated before continuing.
         while (!isStopRequested() && !imu.isGyroCalibrated())
         {
-            sleep(50);
+            sleep(10);
             idle();
         }
 
+        telemetry.addData("Status", imu.getCalibrationStatus().toString());
         telemetry.addData("Status", "Initialized");
-        telemetry.addData("imu calib status", imu.getCalibrationStatus().toString());
         telemetry.update();
 
 
         // wait for start button
         waitForStart();
 
-        // run until the end of the match
-
-
         while (opModeIsActive()) {
+            // Controlling holonomic drive.
             double x = gamepad1.left_stick_x;
-            double y = -gamepad1.left_stick_y;  // left_stick_y is backwards
+            double y = -gamepad1.left_stick_y;  // for some reason y-component opposite of Descartes
             double theta = Math.atan2(y, x);
             double r = Math.sqrt(x*x + y*y);
 
             Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
             double gyro = angles.firstAngle;
-            double angle = theta - gyro;  // for some reason gyro is backwards.
-
-            double rotate = gamepad1.right_stick_x/4;  // rescale to slow it down.
-
-
+            double angle = theta - gyro;  // for some reason gyro is opposite of mathworld
+            double rotate = gamepad1.right_stick_x/3;  // rescale to slow it down.
 
             // (cos, sin) = ne(1, 1) + nw(-1, 1)
             // Now dot with sides with (1, 1) and (-1, 1), then rescale.
@@ -124,7 +125,7 @@ public class TeleWARP extends LinearOpMode {
             back_left_wheel.setPower(nw + rotate);
 
 
-            // ARMS
+            // Little arms
             if (gamepad1.left_bumper) {
                 left_arm.setPosition(0.5);
             } else {
@@ -137,6 +138,28 @@ public class TeleWARP extends LinearOpMode {
             }
 
 
+            // Big arm
+            if (gamepad1.dpad_down) {
+                big_arm_rotate.setPower(.2);
+            } else if (gamepad1.dpad_up) {
+                big_arm_rotate.setPower(-.2);
+            } else {
+                big_arm_rotate.setPower(0);
+            }
+
+            if (gamepad1.dpad_left) {
+                big_arm_extend.setPower(.2);
+            } else if (gamepad1.dpad_right) {
+                big_arm_extend.setPower(-.2);
+            } else {
+                big_arm_extend.setPower(0);
+            }
+
+            if (gamepad1.a) {
+                big_arm_thumb.setPosition(1);
+            }
+
+
             telemetry.addData("Front Left", front_left_wheel.getPower());
             telemetry.addData("Front Right", front_right_wheel.getPower());
             telemetry.addData("Back Left", back_left_wheel.getPower());
@@ -145,8 +168,6 @@ public class TeleWARP extends LinearOpMode {
             telemetry.addData("Left Arm", left_arm.getPosition());
             telemetry.addData("Right Arm", right_arm.getPosition());
             telemetry.update();
-
-
         }
     }
 }
