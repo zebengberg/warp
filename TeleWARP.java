@@ -171,12 +171,12 @@ public class TeleWARP extends LinearOpMode {
             }
 
 
-            telemetry.addData("Front Left", front_left_wheel.getPower());
+            telemetry.addData("Front Left ", front_left_wheel.getPower());
             telemetry.addData("Front Right", front_right_wheel.getPower());
-            telemetry.addData("Back Left", back_left_wheel.getPower());
-            telemetry.addData("Back Right", back_right_wheel.getPower());
+            telemetry.addData("Back Left  ", back_left_wheel.getPower());
+            telemetry.addData("Back Right ", back_right_wheel.getPower());
             telemetry.addData("Rotation Angle", gyro * 180 / Math.PI); // degrees
-            telemetry.addData("Left Arm", left_arm.getPosition());
+            telemetry.addData("Left Arm ", left_arm.getPosition());
             telemetry.addData("Right Arm", right_arm.getPosition());
             telemetry.update();
         }
