@@ -16,6 +16,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 // HOLONOMIC GYRO DRIVE.
 // Includes imu gyro correction, using joystick to pass velocity vector, and simultaneous rotation.
 // WARP Nov 2019
+
+
 @TeleOp
 public class TeleWARP extends LinearOpMode {
 
@@ -29,9 +31,10 @@ public class TeleWARP extends LinearOpMode {
 
     BNO055IMU imu;
 
-    DcMotor big_arm_rotate;
-    DcMotor big_arm_extend;
-    Servo big_arm_thumb;
+    // main arm motors
+    DcMotor elbow;
+    Servo wrist;
+    Servo finger;
 
 
 
@@ -63,10 +66,12 @@ public class TeleWARP extends LinearOpMode {
         right_arm.setDirection(Servo.Direction.REVERSE);
 
         // Motors for big arm
-        big_arm_rotate = hardwareMap.dcMotor.get("big_arm_rotate");
-        big_arm_extend = hardwareMap.dcMotor.get("big_arm_extend");
-        big_arm_thumb = hardwareMap.servo.get("big_arm_thumb");
-        big_arm_thumb.resetDeviceConfigurationForOpMode();
+        elbow = hardwareMap.dcMotor.get("elbow");
+        wrist = hardwareMap.servo.get("wrist");
+        finger = hardwareMap.servo.get("finger");
+        wrist.resetDeviceConfigurationForOpMode();
+        finger.resetDeviceConfigurationForOpMode();
+        boolean finger_state = false;
 
         // IMU DEVICE -- possibly delete some of this.
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -138,25 +143,31 @@ public class TeleWARP extends LinearOpMode {
             }
 
 
-            // Big arm
+            // Big arm controls
+            // TODO: Use encoders to limit movement of elbow motor.
             if (gamepad1.dpad_down) {
-                big_arm_rotate.setPower(.2);
+                elbow.setPower(.2);
             } else if (gamepad1.dpad_up) {
-                big_arm_rotate.setPower(-.2);
+                elbow.setPower(-.2);
             } else {
-                big_arm_rotate.setPower(0);
-            }
-
-            if (gamepad1.dpad_left) {
-                big_arm_extend.setPower(.2);
-            } else if (gamepad1.dpad_right) {
-                big_arm_extend.setPower(-.2);
-            } else {
-                big_arm_extend.setPower(0);
+                elbow.setPower(0);
             }
 
             if (gamepad1.a) {
-                big_arm_thumb.setPosition(1);
+                finger_state = !finger_state;
+            }
+
+            if (finger_state) {
+               finger.setPosition(1);
+            } else {
+                finger.setPosition(0);
+            }
+
+            // controlling a servo as if it were a DC motor
+            if (gamepad1.x) {
+                wrist.setPosition(Math.min(wrist.getPosition() + .1, 1));
+            } else if (gamepad1.b) {
+                wrist.setPosition(Math.max(wrist.getPosition() - .1, 0));
             }
 
 
