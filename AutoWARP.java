@@ -4,8 +4,12 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.robotcontroller.external.samples.SensorColor;
+import org.firstinspires.ftc.robotcontroller.external.samples.SensorREVColorDistance;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
@@ -18,12 +22,18 @@ public class AutoWARP extends LinearOpMode {
     DcMotor back_right_wheel;
     DcMotor front_right_wheel;
 
+    DcMotor[] motors;
+
     Servo left_arm;
     Servo right_arm;
 
     ColorSensor left_color;
     ColorSensor right_color;
     DistanceSensor distance;
+
+
+
+
 
     @Override
     public void runOpMode() {
@@ -32,15 +42,19 @@ public class AutoWARP extends LinearOpMode {
         front_left_wheel = hardwareMap.dcMotor.get("front_left_wheel");
         back_left_wheel = hardwareMap.dcMotor.get("back_left_wheel");
         back_right_wheel = hardwareMap.dcMotor.get("back_right_wheel");
-        // Arbitrary decision to reverse all -- could instead negate powers below.
-        front_left_wheel.setDirection(DcMotor.Direction.REVERSE);
-        back_left_wheel.setDirection(DcMotor.Direction.REVERSE);
-        front_right_wheel.setDirection(DcMotor.Direction.REVERSE);
-        back_right_wheel.setDirection(DcMotor.Direction.REVERSE);
-        front_left_wheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        back_left_wheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        front_right_wheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        back_right_wheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        // Creating an array of motors so we can iterate over it.
+        motors = new DcMotor[] {front_left_wheel, back_left_wheel, back_right_wheel, front_right_wheel};
+
+
+
+
+        for (DcMotor motor : motors) {
+            motor.setDirection(DcMotor.Direction.FORWARD);
+            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
 
         // Servos for little arms
         left_arm = hardwareMap.servo.get("left_arm");
@@ -51,13 +65,22 @@ public class AutoWARP extends LinearOpMode {
         right_arm.setDirection(Servo.Direction.REVERSE);
 
         // Sensors
-        left_color = hardwareMap.colorSensor.get("left_color");
-        right_color = hardwareMap.colorSensor.get("right_color");
+        left_color = hardwareMap.get(ColorSensor.class, "left_color");
+        right_color = hardwareMap.get(ColorSensor.class, "right_color");
         distance = hardwareMap.get(DistanceSensor.class, "distance");
 
         // wait for start button
         waitForStart();
-        while (opModeIsActive()) {
+        for (DcMotor motor : motors) {
+            motor.setTargetPosition(1000);
+            motor.setPower(1);
+        }
+
+        if (opModeIsActive()) {
+
+            goForward();
+            sleep(500);
+
             float reds[] = {left_color.red(), right_color.red()};
             float greens[] = {left_color.green(), right_color.green()};
             float blues[] = {left_color.blue(), right_color.blue()};
@@ -69,6 +92,34 @@ public class AutoWARP extends LinearOpMode {
             telemetry.addData("Blue ", blues);
             telemetry.addData("Alpha", alphas);
             telemetry.update();
+
+        }
+    }
+
+    public void goForward() {
+
+        for (DcMotor motor : motors) {
+            motor.setTargetPosition(5000);
+            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
+
+        front_left_wheel.setPower(1);
+        front_right_wheel.setPower(1);
+        back_left_wheel.setPower(1);
+        back_right_wheel.setPower(1);
+
+
+
+        while ((front_left_wheel.isBusy() || front_right_wheel.isBusy() || back_right_wheel.isBusy()
+                || back_left_wheel.isBusy()) && opModeIsActive()) {
+            telemetry.addData("front left", front_left_wheel.getCurrentPosition());
+            telemetry.addData("front right", front_right_wheel.getCurrentPosition());
+            telemetry.addData("back left", back_left_wheel.getCurrentPosition());
+            telemetry.addData("back right", back_right_wheel.getCurrentPosition());
+            telemetry.update();
+        }
+        for (DcMotor motor : motors) {
+            motor.setPower(0);
         }
     }
 }

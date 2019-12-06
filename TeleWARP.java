@@ -57,6 +57,7 @@ public class TeleWARP extends LinearOpMode {
         front_right_wheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         back_right_wheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+
         // Servos for little arms
         left_arm = hardwareMap.servo.get("left_arm");
         right_arm = hardwareMap.servo.get("right_arm");
@@ -67,6 +68,7 @@ public class TeleWARP extends LinearOpMode {
 
         // Motors for big arm
         elbow = hardwareMap.dcMotor.get("elbow");
+        elbow.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         wrist = hardwareMap.servo.get("wrist");
         finger = hardwareMap.servo.get("finger");
         wrist.resetDeviceConfigurationForOpMode();
