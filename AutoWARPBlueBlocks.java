@@ -46,6 +46,7 @@ public class AutoWARPBlueBlocks extends LinearOpMode {
 
 
         for (DcMotor motor : motors) {
+            // REV HD Hex encoder counts 2240 per rotation.
             motor.setDirection(DcMotor.Direction.FORWARD);
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -74,8 +75,11 @@ public class AutoWARPBlueBlocks extends LinearOpMode {
 
         if (opModeIsActive()) {
 
-            goForward();
+            goForward(10);
             sleep(500);
+            goForward(20);
+            sleep(500);
+            goForward(10);
 
             float reds[] = {left_color.red(), right_color.red()};
             float greens[] = {left_color.green(), right_color.green()};
@@ -92,19 +96,22 @@ public class AutoWARPBlueBlocks extends LinearOpMode {
         }
     }
 
-    public void goForward() {
+    public void goForward(double cm) {
+        int position = (int) (cm * Math.sqrt(0.5) * 2240.0 / 28.0);
+
+        front_left_wheel.setTargetPosition(position);
+        front_left_wheel.setPower(1);
+        back_left_wheel.setTargetPosition(position);
+        back_left_wheel.setPower(1);
+
+        front_right_wheel.setTargetPosition(-position);
+        front_right_wheel.setPower(-1);
+        back_right_wheel.setTargetPosition(-position);
+        back_right_wheel.setPower(-1);
 
         for (DcMotor motor : motors) {
-            motor.setTargetPosition(5000);
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
-
-        front_left_wheel.setPower(1);
-        front_right_wheel.setPower(1);
-        back_left_wheel.setPower(1);
-        back_right_wheel.setPower(1);
-
-
 
         while ((front_left_wheel.isBusy() || front_right_wheel.isBusy() || back_right_wheel.isBusy()
                 || back_left_wheel.isBusy()) && opModeIsActive()) {
@@ -119,3 +126,4 @@ public class AutoWARPBlueBlocks extends LinearOpMode {
         }
     }
 }
+
