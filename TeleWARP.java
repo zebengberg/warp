@@ -32,9 +32,9 @@ public class TeleWARP extends LinearOpMode {
     BNO055IMU imu;
 
     // main arm motors
-    DcMotor elbow;
-    Servo wrist;
-    Servo finger;
+    //DcMotor elbow;
+    //Servo wrist;
+    //Servo finger;
 
 
 
@@ -67,13 +67,13 @@ public class TeleWARP extends LinearOpMode {
         right_arm.setDirection(Servo.Direction.REVERSE);
 
         // Motors for big arm
-        elbow = hardwareMap.dcMotor.get("elbow");
-        elbow.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        wrist = hardwareMap.servo.get("wrist");
-        finger = hardwareMap.servo.get("finger");
-        wrist.resetDeviceConfigurationForOpMode();
-        finger.resetDeviceConfigurationForOpMode();
-        boolean finger_state = false;
+        //elbow = hardwareMap.dcMotor.get("elbow");
+        //elbow.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //wrist = hardwareMap.servo.get("wrist");
+        //finger = hardwareMap.servo.get("finger");
+        //wrist.resetDeviceConfigurationForOpMode();
+        //finger.resetDeviceConfigurationForOpMode();
+        //boolean finger_state = false;
 
         // IMU DEVICE -- possibly delete some of this.
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -145,6 +145,7 @@ public class TeleWARP extends LinearOpMode {
             }
 
 
+            /*
             // Big arm controls
             // TODO: Use encoders to limit movement of elbow motor.
             if (gamepad1.dpad_down) {
@@ -171,6 +172,8 @@ public class TeleWARP extends LinearOpMode {
             } else if (gamepad1.b) {
                 wrist.setPosition(Math.max(wrist.getPosition() - .1, 0));
             }
+
+             */
 
 
             telemetry.addData("Front Left ", front_left_wheel.getPower());

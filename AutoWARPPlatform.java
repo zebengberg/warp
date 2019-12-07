@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 // WARP Dec 2019
 
 @Autonomous
-public class AutoWARPBlueBlocks extends LinearOpMode {
+public class AutoWARPPlatform extends LinearOpMode {
     DcMotor front_left_wheel;
     DcMotor back_left_wheel;
     DcMotor back_right_wheel;
@@ -76,27 +76,15 @@ public class AutoWARPBlueBlocks extends LinearOpMode {
         if (opModeIsActive()) {
 
             goForward(2000);
-            right_arm.setPosition(0.5);
-            sleep(1000);
-
-            goBack(1200);
-            goRight(4000);
-            right_arm.setPosition(0);
-            sleep(1000);
-
-            goLeft(4000);
-            goForward(1200);
             left_arm.setPosition(0.5);
-            sleep(1000);
+            right_arm.setPosition(0.53);
+            sleep(2000);
 
-
-            goBack(1200);
-            goRight(4000);
+            goBack(2000);
             left_arm.setPosition(0);
-            sleep(1000);
+            right_arm.setPosition(0);
+            sleep(2000);
 
-            goLeft(1000);
-            
 
             /*
 
