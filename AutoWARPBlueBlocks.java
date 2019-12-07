@@ -1,3 +1,6 @@
+
+
+
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -74,29 +77,31 @@ public class AutoWARPBlueBlocks extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive()) {
+            left_arm.setPosition(0.0);
 
-            goForward(2000);
-            right_arm.setPosition(0.5);
-            sleep(1000);
-
-            goBack(1200);
-            goRight(4000);
-            right_arm.setPosition(0);
-            sleep(1000);
-
-            goLeft(4000);
-            goForward(1200);
+            goForward(2200);
             left_arm.setPosition(0.5);
-            sleep(1000);
+            sleep(2000);
+
 
 
             goBack(1200);
-            goRight(4000);
+            goLeft(4000);
             left_arm.setPosition(0);
-            sleep(1000);
+            sleep(2000);
 
-            goLeft(1000);
-            
+            goRight(4500);
+            goForward(1200);
+            right_arm.setPosition(0.5);
+            sleep(2000);
+
+
+            goBack(1200);
+            goLeft(4500);
+            sleep(2000);
+
+            goRight(1000);
+
 
             /*
 

@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 // WARP Dec 2019
 
 @Autonomous
-public class AutoWARPRedBlocks extends LinearOpMode {
+public class SleepThenMoveRight extends LinearOpMode {
     DcMotor front_left_wheel;
     DcMotor back_left_wheel;
     DcMotor back_right_wheel;
@@ -74,51 +74,9 @@ public class AutoWARPRedBlocks extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive()) {
-            right_arm.setPosition(0.0);
-
-            goForward(2200);
-            right_arm.setPosition(0.5);
-            sleep(2000);
-
-
-
-            goBack(1200);
-            goRight(4000);
-            right_arm.setPosition(0.0);
-            sleep(2000);
-
-
-            goLeft(4500);
-            goForward(1200);
-            left_arm.setPosition(0.5);
-            sleep(2000);
-
-
-            goBack(1200);
-            goRight(4500);
-            left_arm.setPosition(0.0);
-            sleep(2000);
-
-            goLeft(1000);
-
-
-            /*
-
-            while (opModeIsActive()) {
-                float reds[] = {left_color.red(), right_color.red()};
-                float greens[] = {left_color.green(), right_color.green()};
-                float blues[] = {left_color.blue(), right_color.blue()};
-                float alphas[] = {left_color.alpha(), right_color.alpha()};
-
-                telemetry.addData("Distance (cm)", distance.getDistance(DistanceUnit.CM));
-                telemetry.addData("Red  ", reds);
-                telemetry.addData("Green", greens);
-                telemetry.addData("Blue ", blues);
-                telemetry.addData("Alpha", alphas);
-                telemetry.update();
-            }
-
-             */
+            sleep(27000);
+            goForward(300);
+            goRight(3000);
         }
     }
 
@@ -224,3 +182,4 @@ public class AutoWARPRedBlocks extends LinearOpMode {
         }
     }
 }
+
