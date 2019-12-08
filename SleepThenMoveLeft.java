@@ -75,7 +75,7 @@ public class SleepThenMoveLeft extends LinearOpMode {
 
         if (opModeIsActive()) {
             sleep(27000);
-            goForward(300);
+            goForward(200);
             goLeft(3000);
         }
     }

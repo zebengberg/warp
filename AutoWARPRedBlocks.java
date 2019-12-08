@@ -81,7 +81,6 @@ public class AutoWARPRedBlocks extends LinearOpMode {
             sleep(2000);
 
 
-
             goBack(1200);
             goRight(4000);
             right_arm.setPosition(0.0);
@@ -120,6 +119,11 @@ public class AutoWARPRedBlocks extends LinearOpMode {
 
              */
         }
+    }
+
+    public void isLeftYellow() {
+        // TODO: Write this.
+        //Color.RGBToHSV( (int) stuff goes here.);
     }
 
 

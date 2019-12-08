@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -12,7 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 // WARP Dec 2019
 
 @Autonomous
-public class AutoWARPPlatform extends LinearOpMode {
+public class AutoWARPRedPlatform extends LinearOpMode {
     DcMotor front_left_wheel;
     DcMotor back_left_wheel;
     DcMotor back_right_wheel;
@@ -105,6 +107,7 @@ public class AutoWARPPlatform extends LinearOpMode {
              */
         }
     }
+
 
 
 
