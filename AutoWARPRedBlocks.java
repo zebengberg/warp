@@ -121,11 +121,6 @@ public class AutoWARPRedBlocks extends LinearOpMode {
         }
     }
 
-    public void isLeftYellow() {
-        // TODO: Write this.
-        //Color.RGBToHSV( (int) stuff goes here.);
-    }
-
 
 
     public void goForward(int position) {
