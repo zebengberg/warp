@@ -19,17 +19,10 @@ public class AutoWARPRedPlatform extends LinearOpMode {
     DcMotor back_left_wheel;
     DcMotor back_right_wheel;
     DcMotor front_right_wheel;
-
     DcMotor[] motors;
 
-    Servo left_arm;
-    Servo right_arm;
-
-    //ColorSensor left_color;
-    //ColorSensor right_color;
-    //DistanceSensor distance;
-
-
+    Servo left_platform;
+    Servo right_platform;
 
 
 
@@ -44,10 +37,12 @@ public class AutoWARPRedPlatform extends LinearOpMode {
         // Creating an array of motors so we can iterate over it.
         motors = new DcMotor[] {back_left_wheel, back_right_wheel, front_right_wheel, front_left_wheel};
 
-        left_arm = hardwareMap.servo.get("left_arm");
-        right_arm = hardwareMap.servo.get("right_arm");
-        left_arm.setDirection(Servo.Direction.FORWARD);
-        right_arm.setDirection(Servo.Direction.REVERSE);
+        left_platform = hardwareMap.servo.get("left_platform");
+        right_platform = hardwareMap.servo.get("right_platform");
+        left_platform.setDirection(Servo.Direction.REVERSE);
+        right_platform.setDirection(Servo.Direction.FORWARD);
+        left_platform.setPosition(0);
+        right_platform.setPosition(0);
 
 
 
@@ -59,56 +54,26 @@ public class AutoWARPRedPlatform extends LinearOpMode {
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
 
-        // Servos for little arms
-        left_arm = hardwareMap.servo.get("left_arm");
-        right_arm = hardwareMap.servo.get("right_arm");
-        left_arm.resetDeviceConfigurationForOpMode();
-        right_arm.resetDeviceConfigurationForOpMode();
-        left_arm.setDirection(Servo.Direction.FORWARD);
-        right_arm.setDirection(Servo.Direction.REVERSE);
-
-        // Sensors
-        //left_color = hardwareMap.get(ColorSensor.class, "left_color");
-        //right_color = hardwareMap.get(ColorSensor.class, "right_color");
-        //distance = hardwareMap.get(DistanceSensor.class, "distance");
 
         // wait for start button
         waitForStart();
 
         if (opModeIsActive()) {
 
-            goForward(2000);
-            left_arm.setPosition(0.5);
-            right_arm.setPosition(0.53);
+            goRight(2500);
+            left_platform.setPosition(0.5);
+            right_platform.setPosition(0.5);
             sleep(2000);
 
-            goBack(2000);
-            left_arm.setPosition(0);
-            right_arm.setPosition(0);
+            goLeft(2000);
+            left_platform.setPosition(0);
+            right_platform.setPosition(0);
             sleep(2000);
 
-
-            /*
-
-            while (opModeIsActive()) {
-                float reds[] = {left_color.red(), right_color.red()};
-                float greens[] = {left_color.green(), right_color.green()};
-                float blues[] = {left_color.blue(), right_color.blue()};
-                float alphas[] = {left_color.alpha(), right_color.alpha()};
-
-                telemetry.addData("Distance (cm)", distance.getDistance(DistanceUnit.CM));
-                telemetry.addData("Red  ", reds);
-                telemetry.addData("Green", greens);
-                telemetry.addData("Blue ", blues);
-                telemetry.addData("Alpha", alphas);
-                telemetry.update();
-            }
-
-             */
+            sleep(10000);
+            goForward(2500);
         }
     }
-
-
 
 
     public void goForward(int position) {
@@ -117,19 +82,19 @@ public class AutoWARPRedPlatform extends LinearOpMode {
         back_left_wheel.setTargetPosition(position);
         back_right_wheel.setTargetPosition(-position);
         for (DcMotor motor : motors) {
-            motor.setPower(1);
+            motor.setPower(.5);
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
         while ((front_left_wheel.isBusy() || front_right_wheel.isBusy() || back_right_wheel.isBusy()
                 || back_left_wheel.isBusy()) && opModeIsActive()) {
             telemetry.addData("target position", position);
-            telemetry.addData("front left", front_left_wheel.getCurrentPosition());
-            telemetry.addData("front right", front_right_wheel.getCurrentPosition());
-            telemetry.addData("back left", back_left_wheel.getCurrentPosition());
-            telemetry.addData("back right", back_right_wheel.getCurrentPosition());
+            for (DcMotor motor : motors) {
+                telemetry.addData(motor.getDeviceName(), motor.getCurrentPosition());
+            }
             telemetry.update();
         }
+
         for (DcMotor motor : motors) {
             motor.setPower(0);
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -142,19 +107,19 @@ public class AutoWARPRedPlatform extends LinearOpMode {
         back_left_wheel.setTargetPosition(-position);
         back_right_wheel.setTargetPosition(-position);
         for (DcMotor motor : motors) {
-            motor.setPower(1);
+            motor.setPower(.5);
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
         while ((front_left_wheel.isBusy() || front_right_wheel.isBusy() || back_right_wheel.isBusy()
                 || back_left_wheel.isBusy()) && opModeIsActive()) {
             telemetry.addData("target position", position);
-            telemetry.addData("front left", front_left_wheel.getCurrentPosition());
-            telemetry.addData("front right", front_right_wheel.getCurrentPosition());
-            telemetry.addData("back left", back_left_wheel.getCurrentPosition());
-            telemetry.addData("back right", back_right_wheel.getCurrentPosition());
+            for (DcMotor motor : motors) {
+                telemetry.addData(motor.getDeviceName(), motor.getCurrentPosition());
+            }
             telemetry.update();
         }
+
         for (DcMotor motor : motors) {
             motor.setPower(0);
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -167,19 +132,19 @@ public class AutoWARPRedPlatform extends LinearOpMode {
         back_left_wheel.setTargetPosition(position);
         back_right_wheel.setTargetPosition(position);
         for (DcMotor motor : motors) {
-            motor.setPower(1);
+            motor.setPower(.5);
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
         while ((front_left_wheel.isBusy() || front_right_wheel.isBusy() || back_right_wheel.isBusy()
                 || back_left_wheel.isBusy()) && opModeIsActive()) {
             telemetry.addData("target position", position);
-            telemetry.addData("front left", front_left_wheel.getCurrentPosition());
-            telemetry.addData("front right", front_right_wheel.getCurrentPosition());
-            telemetry.addData("back left", back_left_wheel.getCurrentPosition());
-            telemetry.addData("back right", back_right_wheel.getCurrentPosition());
+            for (DcMotor motor : motors) {
+                telemetry.addData(motor.getDeviceName(), motor.getCurrentPosition());
+            }
             telemetry.update();
         }
+
         for (DcMotor motor : motors) {
             motor.setPower(0);
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -192,19 +157,19 @@ public class AutoWARPRedPlatform extends LinearOpMode {
         back_left_wheel.setTargetPosition(-position);
         back_right_wheel.setTargetPosition(position);
         for (DcMotor motor : motors) {
-            motor.setPower(1);
+            motor.setPower(.5);
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
         while ((front_left_wheel.isBusy() || front_right_wheel.isBusy() || back_right_wheel.isBusy()
                 || back_left_wheel.isBusy()) && opModeIsActive()) {
             telemetry.addData("target position", position);
-            telemetry.addData("front left", front_left_wheel.getCurrentPosition());
-            telemetry.addData("front right", front_right_wheel.getCurrentPosition());
-            telemetry.addData("back left", back_left_wheel.getCurrentPosition());
-            telemetry.addData("back right", back_right_wheel.getCurrentPosition());
+            for (DcMotor motor : motors) {
+                telemetry.addData(motor.getDeviceName(), motor.getCurrentPosition());
+            }
             telemetry.update();
         }
+
         for (DcMotor motor : motors) {
             motor.setPower(0);
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

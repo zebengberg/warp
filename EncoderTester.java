@@ -43,6 +43,9 @@ public class EncoderTester extends LinearOpMode {
         float hue = hsv[0];
         float sat = hsv[1];
         float val = hsv[2];
+        telemetry.addData("red", color.red());
+        telemetry.addData("gre", color.green());
+        telemetry.addData("blu", color.blue());
         telemetry.addData("hue", hue);
         telemetry.addData("sat", sat);
         telemetry.addData("val", val);
