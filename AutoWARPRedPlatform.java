@@ -1,14 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.graphics.Color;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
 // WARP Dec 2019
@@ -37,15 +32,7 @@ public class AutoWARPRedPlatform extends LinearOpMode {
         // Creating an array of motors so we can iterate over it.
         motors = new DcMotor[] {back_left_wheel, back_right_wheel, front_right_wheel, front_left_wheel};
 
-        left_platform = hardwareMap.servo.get("left_platform");
-        right_platform = hardwareMap.servo.get("right_platform");
-        left_platform.setDirection(Servo.Direction.REVERSE);
-        right_platform.setDirection(Servo.Direction.FORWARD);
-        left_platform.setPosition(0);
-        right_platform.setPosition(0);
-
-
-
+        // Initializing the motors.
         for (DcMotor motor : motors) {
             // REV HD Hex encoder counts 2240 per rotation.
             motor.setDirection(DcMotor.Direction.REVERSE);
@@ -54,26 +41,37 @@ public class AutoWARPRedPlatform extends LinearOpMode {
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
 
+        // Servos for moving the platform.
+        left_platform = hardwareMap.servo.get("left_platform");
+        right_platform = hardwareMap.servo.get("right_platform");
+        left_platform.setDirection(Servo.Direction.FORWARD);
+        right_platform.setDirection(Servo.Direction.REVERSE);
+        left_platform.setPosition(0);
+        right_platform.setPosition(0);
 
         // wait for start button
         waitForStart();
 
         if (opModeIsActive()) {
-
-            goRight(2500);
-            left_platform.setPosition(0.5);
+            goRight(2650);
+            left_platform.setPosition(0.4);
             right_platform.setPosition(0.5);
-            sleep(2000);
+            sleep(1000);
 
-            goLeft(2000);
+            goLeft(3000);
             left_platform.setPosition(0);
             right_platform.setPosition(0);
-            sleep(2000);
+            sleep(1000);
+            goLeft(100);
 
-            sleep(10000);
-            goForward(2500);
+
+            goForward(3000);
+            goLeft(200);
+            goForward(800);
+            goLeft(200);
         }
     }
+
 
 
     public void goForward(int position) {
@@ -82,7 +80,7 @@ public class AutoWARPRedPlatform extends LinearOpMode {
         back_left_wheel.setTargetPosition(position);
         back_right_wheel.setTargetPosition(-position);
         for (DcMotor motor : motors) {
-            motor.setPower(.5);
+            motor.setPower(.3);
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
@@ -107,7 +105,7 @@ public class AutoWARPRedPlatform extends LinearOpMode {
         back_left_wheel.setTargetPosition(-position);
         back_right_wheel.setTargetPosition(-position);
         for (DcMotor motor : motors) {
-            motor.setPower(.5);
+            motor.setPower(.3);
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
@@ -132,7 +130,7 @@ public class AutoWARPRedPlatform extends LinearOpMode {
         back_left_wheel.setTargetPosition(position);
         back_right_wheel.setTargetPosition(position);
         for (DcMotor motor : motors) {
-            motor.setPower(.5);
+            motor.setPower(.3);
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
@@ -157,7 +155,7 @@ public class AutoWARPRedPlatform extends LinearOpMode {
         back_left_wheel.setTargetPosition(-position);
         back_right_wheel.setTargetPosition(position);
         for (DcMotor motor : motors) {
-            motor.setPower(.5);
+            motor.setPower(.3);
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
