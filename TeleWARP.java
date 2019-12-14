@@ -32,6 +32,7 @@ public class TeleWARP extends LinearOpMode {
     Servo left_platform;
     Servo right_platform;
     boolean platform_state;
+    double platform_time;
 
     BNO055IMU imu;
 
@@ -72,21 +73,17 @@ public class TeleWARP extends LinearOpMode {
         right_platform.setPosition(0);
         // Keep track of the whether the platform servos are up or down.
         platform_state = false;
+        platform_time = 0.0;
 
 
         // IMU DEVICE
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.mode = BNO055IMU.SensorMode.GYRONLY;
+        parameters.mode = BNO055IMU.SensorMode.IMU;
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         parameters.loggingEnabled = false;
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
-        // Possibly delete
-        //parameters.mode                = BNO055IMU.SensorMode.IMU;
-        //parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        //parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        //parameters.loggingEnabled      = false;
 
         // Make sure the imu gyro is calibrated before continuing.
         telemetry.addData("Status", "calibrating gyro");
@@ -148,9 +145,10 @@ public class TeleWARP extends LinearOpMode {
                 right_arm.setPosition(0);
             }
 
-
-            if (gamepad1.y) {
+            // Set a delay so that the platform state cannot be changed more often than every 0.5s.
+            if (gamepad1.y && (platform_time < time - 0.5)) {
                 platform_state = !platform_state;
+                platform_time = time;
             }
 
             if (platform_state) {

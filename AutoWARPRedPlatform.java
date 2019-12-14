@@ -53,25 +53,79 @@ public class AutoWARPRedPlatform extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive()) {
-            goRight(2650);
+            goRight(500);
+            goBack(1000);
+            goRight(2150);
             left_platform.setPosition(0.4);
             right_platform.setPosition(0.5);
             sleep(1000);
 
-            goLeft(3000);
+            goLeft(2000);
+            rotateCW(2500);
+            goRight(500);
             left_platform.setPosition(0);
             right_platform.setPosition(0);
             sleep(1000);
-            goLeft(100);
 
 
-            goForward(3000);
-            goLeft(200);
-            goForward(800);
-            goLeft(200);
+            goBack(200);
+            goLeft(3000);
+            goBack(200);
+            goLeft(1000);
+            goBack(200);
         }
     }
 
+
+    public void rotateCW(int position) {
+        front_right_wheel.setTargetPosition(position);
+        front_left_wheel.setTargetPosition(position);
+        back_left_wheel.setTargetPosition(position);
+        back_right_wheel.setTargetPosition(position);
+        for (DcMotor motor : motors) {
+            motor.setPower(.3);
+            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
+
+        while ((front_left_wheel.isBusy() || front_right_wheel.isBusy() || back_right_wheel.isBusy()
+                || back_left_wheel.isBusy()) && opModeIsActive()) {
+            telemetry.addData("target position", position);
+            for (DcMotor motor : motors) {
+                telemetry.addData(motor.getDeviceName(), motor.getCurrentPosition());
+            }
+            telemetry.update();
+        }
+
+        for (DcMotor motor : motors) {
+            motor.setPower(0);
+            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
+    }
+
+    public void rotateCCW(int position) {
+        front_right_wheel.setTargetPosition(-position);
+        front_left_wheel.setTargetPosition(-position);
+        back_left_wheel.setTargetPosition(-position);
+        back_right_wheel.setTargetPosition(-position);
+        for (DcMotor motor : motors) {
+            motor.setPower(.3);
+            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
+
+        while ((front_left_wheel.isBusy() || front_right_wheel.isBusy() || back_right_wheel.isBusy()
+                || back_left_wheel.isBusy()) && opModeIsActive()) {
+            telemetry.addData("target position", position);
+            for (DcMotor motor : motors) {
+                telemetry.addData(motor.getDeviceName(), motor.getCurrentPosition());
+            }
+            telemetry.update();
+        }
+
+        for (DcMotor motor : motors) {
+            motor.setPower(0);
+            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
+    }
 
 
     public void goForward(int position) {

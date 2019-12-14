@@ -17,17 +17,14 @@ public class AutoWARPRedBlocks extends LinearOpMode {
     DcMotor back_left_wheel;
     DcMotor back_right_wheel;
     DcMotor front_right_wheel;
-
     DcMotor[] motors;
 
     Servo left_arm;
     Servo right_arm;
 
-    //ColorSensor left_color;
-    //ColorSensor right_color;
-    //DistanceSensor distance;
-
-
+    ColorSensor left_color;
+    ColorSensor right_color;
+    DistanceSensor distance;
 
 
 
@@ -42,13 +39,7 @@ public class AutoWARPRedBlocks extends LinearOpMode {
         // Creating an array of motors so we can iterate over it.
         motors = new DcMotor[] {back_left_wheel, back_right_wheel, front_right_wheel, front_left_wheel};
 
-        left_arm = hardwareMap.servo.get("left_arm");
-        right_arm = hardwareMap.servo.get("right_arm");
-        left_arm.setDirection(Servo.Direction.FORWARD);
-        right_arm.setDirection(Servo.Direction.REVERSE);
-
-
-
+        // Initializing the motors.
         for (DcMotor motor : motors) {
             // REV HD Hex encoder counts 2240 per rotation.
             motor.setDirection(DcMotor.Direction.REVERSE);
@@ -60,23 +51,25 @@ public class AutoWARPRedBlocks extends LinearOpMode {
         // Servos for little arms
         left_arm = hardwareMap.servo.get("left_arm");
         right_arm = hardwareMap.servo.get("right_arm");
-        left_arm.resetDeviceConfigurationForOpMode();
-        right_arm.resetDeviceConfigurationForOpMode();
         left_arm.setDirection(Servo.Direction.FORWARD);
         right_arm.setDirection(Servo.Direction.REVERSE);
+        left_arm.setPosition(0);
+        right_arm.setPosition(0);
 
         // Sensors
-        //left_color = hardwareMap.get(ColorSensor.class, "left_color");
-        //right_color = hardwareMap.get(ColorSensor.class, "right_color");
-        //distance = hardwareMap.get(DistanceSensor.class, "distance");
+        left_color = hardwareMap.get(ColorSensor.class, "left_color");
+        right_color = hardwareMap.get(ColorSensor.class, "right_color");
+        distance = hardwareMap.get(DistanceSensor.class, "distance");
 
         // wait for start button
         waitForStart();
 
         if (opModeIsActive()) {
-            right_arm.setPosition(0.0);
-
             goForward(2200);
+            while (true) {
+                //TODO: color stuff here.
+
+            }
             right_arm.setPosition(0.5);
             sleep(2000);
 
