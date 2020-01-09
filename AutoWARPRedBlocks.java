@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -67,51 +69,50 @@ public class AutoWARPRedBlocks extends LinearOpMode {
         if (opModeIsActive()) {
             goForward(2200);
             while (true) {
-                //TODO: color stuff here.
-
+                if (isYellow()) {
+                    goRight(500);
+                } else {
+                    break;
+                }
             }
+
             right_arm.setPosition(0.5);
             sleep(2000);
-
-
             goBack(1200);
-            goRight(4000);
+            goLeft(4000);
+            right_arm.setPosition(0.0);
+            sleep(2000);
+            goLeft(4500);
+            goForward(1200);
+
+            while (true) {
+                if (isYellow()) {
+                    goRight(500);
+                } else {
+                    break;
+                }
+            }
+
+
+            right_arm.setPosition(0.5);
+            sleep(2000);
+            goBack(1200);
+            goLeft(4000);
             right_arm.setPosition(0.0);
             sleep(2000);
 
-
-            goLeft(4500);
-            goForward(1200);
-            left_arm.setPosition(0.5);
-            sleep(2000);
-
-
-            goBack(1200);
-            goRight(4500);
-            left_arm.setPosition(0.0);
-            sleep(2000);
-
+            // Going to sky bridge tape.
             goLeft(1000);
-
-
-            /*
-
-            while (opModeIsActive()) {
-                float reds[] = {left_color.red(), right_color.red()};
-                float greens[] = {left_color.green(), right_color.green()};
-                float blues[] = {left_color.blue(), right_color.blue()};
-                float alphas[] = {left_color.alpha(), right_color.alpha()};
-
-                telemetry.addData("Distance (cm)", distance.getDistance(DistanceUnit.CM));
-                telemetry.addData("Red  ", reds);
-                telemetry.addData("Green", greens);
-                telemetry.addData("Blue ", blues);
-                telemetry.addData("Alpha", alphas);
-                telemetry.update();
-            }
-
-             */
         }
+    }
+
+    public boolean isYellow() {
+        float[] hsv = {0F, 0F, 0F};
+        Color.RGBToHSV(left_color.red() * 255, left_color.green() * 255, left_color.blue() * 255, hsv);
+        float hue = hsv[0];
+        float sat = hsv[1];
+        float val = hsv[2];
+        return (hue < 90);
     }
 
 
