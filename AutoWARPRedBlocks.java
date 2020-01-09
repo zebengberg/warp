@@ -67,10 +67,10 @@ public class AutoWARPRedBlocks extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive()) {
-            goForward(2200);
+            goLeft(2200);
             while (true) {
                 if (isYellow()) {
-                    goRight(500);
+                    goForward(500);
                 } else {
                     break;
                 }
@@ -78,16 +78,16 @@ public class AutoWARPRedBlocks extends LinearOpMode {
 
             right_arm.setPosition(0.5);
             sleep(2000);
-            goBack(1200);
-            goLeft(4000);
+            goRight(1200);
+            goBack(4000);
             right_arm.setPosition(0.0);
             sleep(2000);
-            goLeft(4500);
-            goForward(1200);
+            goForward(4500);
+            goLeft(1200);
 
             while (true) {
                 if (isYellow()) {
-                    goRight(500);
+                    goForward(500);
                 } else {
                     break;
                 }
@@ -96,13 +96,13 @@ public class AutoWARPRedBlocks extends LinearOpMode {
 
             right_arm.setPosition(0.5);
             sleep(2000);
-            goBack(1200);
-            goLeft(4000);
+            goRight(1200);
+            goBack(4000);
             right_arm.setPosition(0.0);
             sleep(2000);
 
             // Going to sky bridge tape.
-            goLeft(1000);
+            goForward(1000);
         }
     }
 
