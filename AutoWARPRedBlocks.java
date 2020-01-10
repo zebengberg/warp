@@ -15,18 +15,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @Autonomous
 public class AutoWARPRedBlocks extends LinearOpMode {
-    DcMotor front_left_wheel;
-    DcMotor back_left_wheel;
-    DcMotor back_right_wheel;
-    DcMotor front_right_wheel;
-    DcMotor[] motors;
+    private DcMotor front_left_wheel;
+    private DcMotor back_left_wheel;
+    private DcMotor back_right_wheel;
+    private DcMotor front_right_wheel;
+    private DcMotor[] motors;
 
-    Servo left_arm;
-    Servo right_arm;
-
-    ColorSensor left_color;
-    ColorSensor right_color;
-    DistanceSensor distance;
+    private Servo right_arm;
+    private Servo left_arm;
+    private ColorSensor right_color;
 
 
 
@@ -59,65 +56,72 @@ public class AutoWARPRedBlocks extends LinearOpMode {
         right_arm.setPosition(0);
 
         // Sensors
-        left_color = hardwareMap.get(ColorSensor.class, "left_color");
         right_color = hardwareMap.get(ColorSensor.class, "right_color");
-        distance = hardwareMap.get(DistanceSensor.class, "distance");
+
 
         // wait for start button
         waitForStart();
 
         if (opModeIsActive()) {
-            goLeft(2200);
+            goLeft(2280);
+            int block_count = 0;
+            int block_size = 700;
             while (true) {
-                if (isYellow()) {
-                    goForward(500);
+                if (isYellow() & block_count < 2) {
+                    goForward(block_size);
+                    block_count++;
                 } else {
+                    block_count++;
                     break;
                 }
             }
 
-            right_arm.setPosition(0.5);
-            sleep(2000);
-            goRight(1200);
-            goBack(4000);
+            right_arm.setPosition(0.55);
+            sleep(1500);
+            goRight(700);
+            goBack(2000 + block_count * block_size);
             right_arm.setPosition(0.0);
-            sleep(2000);
-            goForward(4500);
-            goLeft(1200);
+            sleep(1000);
+            goRight(200);
+            block_count += 3;
+            goForward(1500 + block_count * block_size);
+            goLeft(900);
+
 
             while (true) {
                 if (isYellow()) {
-                    goForward(500);
+                    goForward(200);
                 } else {
+                    goForward(200);
                     break;
                 }
             }
 
-
-            right_arm.setPosition(0.5);
-            sleep(2000);
-            goRight(1200);
-            goBack(4000);
+            right_arm.setPosition(0.55);
+            sleep(1500);
+            goRight(600);
+            goBack(2000 + block_count * block_size);
             right_arm.setPosition(0.0);
-            sleep(2000);
+            sleep(1000);
 
             // Going to sky bridge tape.
             goForward(1000);
+
+            // Doing some stuff to get ready for autonomous
+            right_arm.setPosition(0.3);
+            left_arm.setPosition(0.3);
         }
     }
 
-    public boolean isYellow() {
+    private boolean isYellow() {
         float[] hsv = {0F, 0F, 0F};
-        Color.RGBToHSV(left_color.red() * 255, left_color.green() * 255, left_color.blue() * 255, hsv);
-        float hue = hsv[0];
-        float sat = hsv[1];
-        float val = hsv[2];
+        Color.RGBToHSV(right_color.red() * 255, right_color.green() * 255, right_color.blue() * 255, hsv);
+        float hue = hsv[0];  // sat = hsv[1] and val = hsv[2]
         return (hue < 90);
     }
 
 
-
-    public void goForward(int position) {
+    private void goForward(int position) {
         front_right_wheel.setTargetPosition(-position);
         front_left_wheel.setTargetPosition(position);
         back_left_wheel.setTargetPosition(position);
@@ -142,7 +146,7 @@ public class AutoWARPRedBlocks extends LinearOpMode {
         }
     }
 
-    public void goRight(int position) {
+    private void goRight(int position) {
         front_right_wheel.setTargetPosition(position);
         front_left_wheel.setTargetPosition(position);
         back_left_wheel.setTargetPosition(-position);
@@ -167,7 +171,7 @@ public class AutoWARPRedBlocks extends LinearOpMode {
         }
     }
 
-    public void goLeft(int position) {
+    private void goLeft(int position) {
         front_right_wheel.setTargetPosition(-position);
         front_left_wheel.setTargetPosition(-position);
         back_left_wheel.setTargetPosition(position);
@@ -192,7 +196,7 @@ public class AutoWARPRedBlocks extends LinearOpMode {
         }
     }
 
-    public void goBack(int position) {
+    private void goBack(int position) {
         front_right_wheel.setTargetPosition(position);
         front_left_wheel.setTargetPosition(-position);
         back_left_wheel.setTargetPosition(-position);
