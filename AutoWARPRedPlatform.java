@@ -53,6 +53,8 @@ public class AutoWARPRedPlatform extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive()) {
+
+            // Moving to platform.
             goRight(500);
             goBack(1000);
             goRight(2150);
@@ -60,6 +62,7 @@ public class AutoWARPRedPlatform extends LinearOpMode {
             right_platform.setPosition(0.5);
             sleep(1000);
 
+            // Dragging platform
             goLeft(2000);
             rotateCW(2500);
             goRight(500);
@@ -68,6 +71,7 @@ public class AutoWARPRedPlatform extends LinearOpMode {
             sleep(1000);
 
 
+            // going under the bridge
             goBack(200);
             goLeft(3000);
             goBack(200);

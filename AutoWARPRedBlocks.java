@@ -25,6 +25,9 @@ public class AutoWARPRedBlocks extends LinearOpMode {
     private Servo left_arm;
     private ColorSensor right_color;
 
+    // Creating a macro for speed of DC motors.
+    double speed = 0.7;
+
 
 
     @Override
@@ -42,7 +45,7 @@ public class AutoWARPRedBlocks extends LinearOpMode {
         for (DcMotor motor : motors) {
             // REV HD Hex encoder counts 2240 per rotation.
             motor.setDirection(DcMotor.Direction.REVERSE);
-            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
@@ -62,10 +65,12 @@ public class AutoWARPRedBlocks extends LinearOpMode {
         // wait for start button
         waitForStart();
 
+        int block_count = 0;
+        int block_size = 750;
+
+        // Going to the blocks initially. Finding the first black block.
         if (opModeIsActive()) {
             goLeft(2280);
-            int block_count = 0;
-            int block_size = 700;
             while (true) {
                 if (isYellow() & block_count < 2) {
                     goForward(block_size);
@@ -76,18 +81,21 @@ public class AutoWARPRedBlocks extends LinearOpMode {
                 }
             }
 
+            // Grabbing the black block and moving back toward fence.
             right_arm.setPosition(0.55);
             sleep(1500);
             goRight(700);
-            goBack(2000 + block_count * block_size);
+
+            // Going under the skystone bridge. Releasing block. Moving back toward fence a hair.
+            goBack(2500 + block_count * block_size);
             right_arm.setPosition(0.0);
             sleep(1000);
             goRight(200);
             block_count += 3;
-            goForward(1500 + block_count * block_size);
+
+            // Going back to the blocks. Finding a black one.
+            goForward(2000 + block_count * block_size);
             goLeft(900);
-
-
             while (true) {
                 if (isYellow()) {
                     goForward(200);
@@ -97,17 +105,22 @@ public class AutoWARPRedBlocks extends LinearOpMode {
                 }
             }
 
+            // Grabbing the black block and moving back toward fence.
             right_arm.setPosition(0.55);
             sleep(1500);
             goRight(600);
+
+            // Going under the skystone bridge and releasing block.
             goBack(2000 + block_count * block_size);
             right_arm.setPosition(0.0);
             sleep(1000);
+            goRight(200);
 
             // Going to sky bridge tape.
             goForward(1000);
 
             // Doing some stuff to get ready for autonomous
+            goLeft(500);
             right_arm.setPosition(0.3);
             left_arm.setPosition(0.3);
         }
@@ -127,7 +140,7 @@ public class AutoWARPRedBlocks extends LinearOpMode {
         back_left_wheel.setTargetPosition(position);
         back_right_wheel.setTargetPosition(-position);
         for (DcMotor motor : motors) {
-            motor.setPower(1);
+            motor.setPower(speed);
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
@@ -152,7 +165,7 @@ public class AutoWARPRedBlocks extends LinearOpMode {
         back_left_wheel.setTargetPosition(-position);
         back_right_wheel.setTargetPosition(-position);
         for (DcMotor motor : motors) {
-            motor.setPower(1);
+            motor.setPower(speed);
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
@@ -177,7 +190,7 @@ public class AutoWARPRedBlocks extends LinearOpMode {
         back_left_wheel.setTargetPosition(position);
         back_right_wheel.setTargetPosition(position);
         for (DcMotor motor : motors) {
-            motor.setPower(1);
+            motor.setPower(speed);
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
@@ -202,7 +215,7 @@ public class AutoWARPRedBlocks extends LinearOpMode {
         back_left_wheel.setTargetPosition(-position);
         back_right_wheel.setTargetPosition(position);
         for (DcMotor motor : motors) {
-            motor.setPower(1);
+            motor.setPower(speed);
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 

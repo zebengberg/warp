@@ -20,19 +20,22 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 @TeleOp
 public class TeleWARP extends LinearOpMode {
-    DcMotor front_left_wheel;
-    DcMotor back_left_wheel;
-    DcMotor back_right_wheel;
-    DcMotor front_right_wheel;
-    DcMotor[] motors;
+    private DcMotor front_left_wheel;
+    private DcMotor back_left_wheel;
+    private DcMotor back_right_wheel;
+    private DcMotor front_right_wheel;
+    private DcMotor[] motors;
 
-    Servo left_arm;
-    Servo right_arm;
+    private Servo left_arm;
+    private Servo right_arm;
 
-    Servo left_platform;
-    Servo right_platform;
-    boolean platform_state;
-    double platform_time;
+    private Servo left_platform;
+    private Servo right_platform;
+    private boolean platform_state;
+    private double platform_time;
+
+    private DcMotor big_arm;
+    private Servo wrist;
 
     BNO055IMU imu;
 
@@ -74,6 +77,11 @@ public class TeleWARP extends LinearOpMode {
         // Keep track of the whether the platform servos are up or down.
         platform_state = false;
         platform_time = 0.0;
+
+        // Motors for big arm.
+        big_arm = hardwareMap.dcMotor.get("big_arm");
+        wrist = hardwareMap.servo.get("wrist");
+
 
 
         // IMU DEVICE
@@ -159,6 +167,21 @@ public class TeleWARP extends LinearOpMode {
                 right_platform.setPosition(0);
             }
 
+            // Controlling the big arm.
+            if (gamepad1.left_trigger > 0) {
+                big_arm.setPower(gamepad1.left_trigger);
+            } else if (gamepad1.right_trigger > 0) {
+                big_arm.setPower(-gamepad1.right_trigger);
+            } else {
+                big_arm.setPower(0);
+            }
+            if (gamepad1.b) {
+                wrist.setPosition(0.5);
+            } else {
+                wrist.setPosition(0);
+            }
+
+
 
             telemetry.addData("Front Left ", front_left_wheel.getPower());
             telemetry.addData("Front Right", front_right_wheel.getPower());
@@ -167,6 +190,7 @@ public class TeleWARP extends LinearOpMode {
             telemetry.addData("Rotation Angle", gyro * 180 / Math.PI); // degrees
             telemetry.addData("Left Arm ", left_arm.getPosition());
             telemetry.addData("Right Arm", right_arm.getPosition());
+            telemetry.addData("Big Arm", big_arm.getPower());
             telemetry.update();
         }
     }
