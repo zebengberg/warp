@@ -30,7 +30,7 @@ public class AutoWARPRedBlocksExperimental extends LinearOpMode {
     private ColorSensor right_color;
 
     // Creating a macro for speed of DC motors.
-    private double speed = 0.7;
+    private double speed = 0.3;
 
     // IMU DEVICE
     private BNO055IMU imu;
@@ -54,8 +54,8 @@ public class AutoWARPRedBlocksExperimental extends LinearOpMode {
             // REV HD Hex encoder counts 2240 per rotation.
             motor.setDirection(DcMotor.Direction.REVERSE);
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
 
         // Servos for little arms
@@ -79,24 +79,32 @@ public class AutoWARPRedBlocksExperimental extends LinearOpMode {
         imu.initialize(parameters);
 
 
-        // Make sure the imu gyro is calibrated before continuing.
+        // Try to calibrate imu before op mode starts.
         telemetry.addData("Status", "calibrating gyro");
         telemetry.update();
-        while (!isStopRequested() && !imu.isGyroCalibrated())
+        while (!opModeIsActive() && !imu.isGyroCalibrated())
         {
-            sleep(10);
+            sleep(50);
             idle();
         }
 
+        telemetry.addData("Status", "gyro calibrated");
+        for (DcMotor motor : motors) {
+            telemetry.addData("motor mode", motor.getMode());
+        }
+        telemetry.update();
 
-        // wait for start button
-        waitForStart();
+
+
 
         int block_count = 0;
         int block_size = 710;
 
+        // wait for start button
+        waitForStart();
         // Going to the blocks initially. Finding the first black block.
         if (opModeIsActive()) {
+            goLeft(10000);
             goLeft(2240);
             while (true) {
                 if (isYellow() & block_count < 2) {
@@ -164,8 +172,8 @@ public class AutoWARPRedBlocksExperimental extends LinearOpMode {
 
     private void goForward(int position) {
         while (((front_left_wheel.getCurrentPosition() +
-                back_left_wheel.getCurrentPosition() -
-                front_right_wheel.getCurrentPosition() -
+                back_left_wheel.getCurrentPosition() +
+                front_right_wheel.getCurrentPosition() +
                 back_right_wheel.getCurrentPosition()) / 4  < position) && opModeIsActive()) {
             // Change the power if the robot is not moving in the correct direction.
             Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
@@ -186,6 +194,7 @@ public class AutoWARPRedBlocksExperimental extends LinearOpMode {
         for (DcMotor motor : motors) {
             motor.setPower(0);
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
     }
 
@@ -213,15 +222,17 @@ public class AutoWARPRedBlocksExperimental extends LinearOpMode {
         for (DcMotor motor : motors) {
             motor.setPower(0);
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
     }
 
 
     private void goLeft(int position) {
-        while (((-front_left_wheel.getCurrentPosition() +
-                back_left_wheel.getCurrentPosition() -
+        while (((front_left_wheel.getCurrentPosition() +
+                back_left_wheel.getCurrentPosition() +
                 front_right_wheel.getCurrentPosition() +
                 back_right_wheel.getCurrentPosition()) / 4  < position) && opModeIsActive()) {
+
             // Change the power if the robot is not moving in the correct direction.
             Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
             double gyro = angles.firstAngle;
@@ -237,10 +248,23 @@ public class AutoWARPRedBlocksExperimental extends LinearOpMode {
             front_right_wheel.setPower(-nw);
             back_right_wheel.setPower(ne);
             back_left_wheel.setPower(nw);
+
+            telemetry.addData("average position", (-front_left_wheel.getCurrentPosition() +
+                    back_left_wheel.getCurrentPosition() -
+                    front_right_wheel.getCurrentPosition() +
+                    back_right_wheel.getCurrentPosition()) / 4);
+            telemetry.addData("front left power", front_left_wheel.getPower());
+            telemetry.addData("front right power", front_right_wheel.getPower());
+            telemetry.addData("back left power", back_left_wheel.getPower());
+            telemetry.addData("back right power", back_right_wheel.getPower());
+            telemetry.addData("gyro", gyro);
+            telemetry.update();
+
         }
         for (DcMotor motor : motors) {
             motor.setPower(0);
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
     }
 
@@ -270,6 +294,7 @@ public class AutoWARPRedBlocksExperimental extends LinearOpMode {
         for (DcMotor motor : motors) {
             motor.setPower(0);
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
     }
 }
