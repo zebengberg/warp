@@ -45,7 +45,7 @@ public class AutoWARPRedBlocks extends LinearOpMode {
         for (DcMotor motor : motors) {
             // REV HD Hex encoder counts 2240 per rotation.
             motor.setDirection(DcMotor.Direction.REVERSE);
-            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
@@ -95,7 +95,7 @@ public class AutoWARPRedBlocks extends LinearOpMode {
 
             // Going back to the blocks. Finding a black one.
             goForward(2000 + block_count * block_size);
-            goLeft(900);
+            goLeft(1000);
             while (true) {
                 if (isYellow()) {
                     goForward(200);

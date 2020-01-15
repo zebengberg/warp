@@ -169,14 +169,14 @@ public class TeleWARP extends LinearOpMode {
 
             // Controlling the big arm.
             if (gamepad1.left_trigger > 0) {
-                big_arm.setPower(gamepad1.left_trigger);
+                big_arm.setPower(0.2 * gamepad1.left_trigger);
             } else if (gamepad1.right_trigger > 0) {
-                big_arm.setPower(-gamepad1.right_trigger);
+                big_arm.setPower(- 0.2 * gamepad1.right_trigger);
             } else {
                 big_arm.setPower(0);
             }
             if (gamepad1.b) {
-                wrist.setPosition(0.5);
+                wrist.setPosition(1);
             } else {
                 wrist.setPosition(0);
             }
