@@ -26,7 +26,7 @@ public class AutoWARPRedBlocks extends LinearOpMode {
     private ColorSensor right_color;
 
     // Creating a macro for speed of DC motors.
-    double speed = 0.7;
+    private double speed = 0.7;
 
 
 
@@ -57,6 +57,7 @@ public class AutoWARPRedBlocks extends LinearOpMode {
         right_arm.setDirection(Servo.Direction.REVERSE);
         left_arm.setPosition(0);
         right_arm.setPosition(0);
+        sleep(500);
 
         // Sensors
         right_color = hardwareMap.get(ColorSensor.class, "right_color");
@@ -66,11 +67,11 @@ public class AutoWARPRedBlocks extends LinearOpMode {
         waitForStart();
 
         int block_count = 0;
-        int block_size = 750;
+        int block_size = 710;
 
         // Going to the blocks initially. Finding the first black block.
         if (opModeIsActive()) {
-            goLeft(2280);
+            goLeft(2240);
             while (true) {
                 if (isYellow() & block_count < 2) {
                     goForward(block_size);
@@ -82,20 +83,20 @@ public class AutoWARPRedBlocks extends LinearOpMode {
             }
 
             // Grabbing the black block and moving back toward fence.
-            right_arm.setPosition(0.55);
-            sleep(1500);
-            goRight(700);
+            right_arm.setPosition(0.70);
+            sleep(1000);
+            goRight(800);
 
             // Going under the skystone bridge. Releasing block. Moving back toward fence a hair.
-            goBack(2500 + block_count * block_size);
-            right_arm.setPosition(0.0);
-            sleep(1000);
+            goBack(2250 + block_count * block_size);
+            right_arm.setPosition(0);
+            sleep(500);
             goRight(200);
             block_count += 3;
 
             // Going back to the blocks. Finding a black one.
-            goForward(2000 + block_count * block_size);
-            goLeft(1000);
+            goForward(1750 + block_count * block_size);
+            goLeft(1150);
             while (true) {
                 if (isYellow()) {
                     goForward(200);
@@ -106,23 +107,23 @@ public class AutoWARPRedBlocks extends LinearOpMode {
             }
 
             // Grabbing the black block and moving back toward fence.
-            right_arm.setPosition(0.55);
-            sleep(1500);
+            right_arm.setPosition(0.70);
+            sleep(1000);
             goRight(600);
 
             // Going under the skystone bridge and releasing block.
             goBack(2000 + block_count * block_size);
-            right_arm.setPosition(0.0);
-            sleep(1000);
+            right_arm.setPosition(0);
+            sleep(500);
             goRight(200);
 
             // Going to sky bridge tape.
-            goForward(1000);
+            goForward(1100);
 
             // Doing some stuff to get ready for autonomous
-            goLeft(500);
-            right_arm.setPosition(0.3);
-            left_arm.setPosition(0.3);
+            goLeft(1000);
+            right_arm.setPosition(0.4);
+            left_arm.setPosition(0.4);
         }
     }
 
