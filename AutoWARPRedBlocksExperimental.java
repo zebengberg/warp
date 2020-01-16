@@ -96,7 +96,6 @@ public class AutoWARPRedBlocksExperimental extends LinearOpMode {
 
 
 
-
         int block_count = 0;
         int block_size = 710;
 

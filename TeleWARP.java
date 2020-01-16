@@ -98,7 +98,7 @@ public class TeleWARP extends LinearOpMode {
         telemetry.update();
         while (!isStopRequested() && !imu.isGyroCalibrated())
         {
-            sleep(10);
+            sleep(50);
             idle();
         }
 
