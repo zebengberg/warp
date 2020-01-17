@@ -36,6 +36,8 @@ public class TeleWARP extends LinearOpMode {
 
     private DcMotor big_arm;
     private Servo wrist;
+    private boolean small_arms_down_state;
+    private double small_arms_down_time;
 
     BNO055IMU imu;
 
@@ -66,6 +68,8 @@ public class TeleWARP extends LinearOpMode {
         right_arm.setDirection(Servo.Direction.REVERSE);
         left_arm.setPosition(0.5);
         right_arm.setPosition(0.5);
+        small_arms_down_state = false;
+        small_arms_down_time = 0.0;
 
         // Servos for moving the platform.
         left_platform = hardwareMap.servo.get("left_platform");
@@ -142,15 +146,29 @@ public class TeleWARP extends LinearOpMode {
 
 
             // Little arms
+
+            if ((gamepad1.x) && (small_arms_down_time < time - 0.5)) {
+                small_arms_down_state = !small_arms_down_state;
+                small_arms_down_time = time;
+            }
+
             if (gamepad1.left_bumper) {
-                left_arm.setPosition(1);
+                left_arm.setPosition(0.69);
             } else {
-                left_arm.setPosition(0);
+                if (small_arms_down_state) {
+                    left_arm.setPosition(0);
+                } else {
+                    left_arm.setPosition(0.46);
+                }
             }
             if (gamepad1.right_bumper) {
-                right_arm.setPosition(1);
+                right_arm.setPosition(0.75);
             } else {
-                right_arm.setPosition(0);
+                if (small_arms_down_state) {
+                    right_arm.setPosition(0);
+                } else {
+                    right_arm.setPosition(0.5);
+                }
             }
 
             // Set a delay so that the platform state cannot be changed more often than every 0.5s.
