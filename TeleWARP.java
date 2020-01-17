@@ -28,6 +28,8 @@ public class TeleWARP extends LinearOpMode {
 
     private Servo left_arm;
     private Servo right_arm;
+    private boolean small_arms_down_state;
+    private double small_arms_down_time;
 
     private Servo left_platform;
     private Servo right_platform;
@@ -36,8 +38,9 @@ public class TeleWARP extends LinearOpMode {
 
     private DcMotor big_arm;
     private Servo wrist;
-    private boolean small_arms_down_state;
-    private double small_arms_down_time;
+    private boolean wrist_state;
+    private double wrist_time;
+
 
     BNO055IMU imu;
 
@@ -66,7 +69,7 @@ public class TeleWARP extends LinearOpMode {
         right_arm = hardwareMap.servo.get("right_arm");
         left_arm.setDirection(Servo.Direction.FORWARD);
         right_arm.setDirection(Servo.Direction.REVERSE);
-        left_arm.setPosition(0.5);
+        left_arm.setPosition(0.45);
         right_arm.setPosition(0.5);
         small_arms_down_state = false;
         small_arms_down_time = 0.0;
@@ -85,6 +88,8 @@ public class TeleWARP extends LinearOpMode {
         // Motors for big arm.
         big_arm = hardwareMap.dcMotor.get("big_arm");
         wrist = hardwareMap.servo.get("wrist");
+        wrist_state = false;
+        wrist_time = 0.0;
 
 
 
@@ -147,7 +152,7 @@ public class TeleWARP extends LinearOpMode {
 
             // Little arms
 
-            if ((gamepad1.x) && (small_arms_down_time < time - 0.5)) {
+            if (gamepad1.x && (small_arms_down_time < time - 0.5)) {
                 small_arms_down_state = !small_arms_down_state;
                 small_arms_down_time = time;
             }
@@ -158,7 +163,7 @@ public class TeleWARP extends LinearOpMode {
                 if (small_arms_down_state) {
                     left_arm.setPosition(0);
                 } else {
-                    left_arm.setPosition(0.46);
+                    left_arm.setPosition(0.45);
                 }
             }
             if (gamepad1.right_bumper) {
@@ -170,6 +175,7 @@ public class TeleWARP extends LinearOpMode {
                     right_arm.setPosition(0.5);
                 }
             }
+
 
             // Set a delay so that the platform state cannot be changed more often than every 0.5s.
             if (gamepad1.y && (platform_time < time - 0.5)) {
@@ -185,6 +191,7 @@ public class TeleWARP extends LinearOpMode {
                 right_platform.setPosition(0);
             }
 
+
             // Controlling the big arm.
             if (gamepad1.left_trigger > 0) {
                 big_arm.setPower(0.2 * gamepad1.left_trigger);
@@ -193,13 +200,17 @@ public class TeleWARP extends LinearOpMode {
             } else {
                 big_arm.setPower(0);
             }
-            if (gamepad1.b) {
-                wrist.setPosition(1);
+            // Using a delay to set the wrist grabber.
+            if (gamepad1.b && (wrist_time < time - 0.5)) {
+                wrist_state = !wrist_state;
+                wrist_time = time;
+            }
+
+            if (wrist_state) {
+                wrist.setPosition(0.6);
             } else {
                 wrist.setPosition(0);
             }
-
-
 
             telemetry.addData("Front Left ", front_left_wheel.getPower());
             telemetry.addData("Front Right", front_right_wheel.getPower());
@@ -209,6 +220,7 @@ public class TeleWARP extends LinearOpMode {
             telemetry.addData("Left Arm ", left_arm.getPosition());
             telemetry.addData("Right Arm", right_arm.getPosition());
             telemetry.addData("Big Arm", big_arm.getPower());
+            telemetry.addData("Wrist", wrist.getPosition());
             telemetry.update();
         }
     }
