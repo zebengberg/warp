@@ -64,8 +64,8 @@ public class TeleWARP extends LinearOpMode {
         right_arm = hardwareMap.servo.get("right_arm");
         left_arm.setDirection(Servo.Direction.FORWARD);
         right_arm.setDirection(Servo.Direction.REVERSE);
-        left_arm.setPosition(0);
-        right_arm.setPosition(0);
+        left_arm.setPosition(0.5);
+        right_arm.setPosition(0.5);
 
         // Servos for moving the platform.
         left_platform = hardwareMap.servo.get("left_platform");
@@ -143,12 +143,12 @@ public class TeleWARP extends LinearOpMode {
 
             // Little arms
             if (gamepad1.left_bumper) {
-                left_arm.setPosition(0.5);
+                left_arm.setPosition(1);
             } else {
                 left_arm.setPosition(0);
             }
             if (gamepad1.right_bumper) {
-                right_arm.setPosition(0.5);
+                right_arm.setPosition(1);
             } else {
                 right_arm.setPosition(0);
             }

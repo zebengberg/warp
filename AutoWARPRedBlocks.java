@@ -71,6 +71,13 @@ public class AutoWARPRedBlocks extends LinearOpMode {
 
         // Going to the blocks initially. Finding the first black block.
         if (opModeIsActive()) {
+            left_arm.setPosition(0);
+            right_arm.setPosition(0);
+            sleep(10000);
+
+
+
+
             goLeft(2240);
             while (true) {
                 if (isYellow() & block_count < 2) {
