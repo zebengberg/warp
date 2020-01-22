@@ -25,6 +25,12 @@ public class TeleWARP extends LinearOpMode {
     private DcMotor back_right_wheel;
     private DcMotor front_right_wheel;
     private DcMotor[] motors;
+    private double reset_angle;
+    private double dc_power_state;
+    private double dc_power_time;
+    private double rot_power_state;
+    private double rot_power_time;
+
 
     private Servo left_arm;
     private Servo right_arm;
@@ -63,6 +69,11 @@ public class TeleWARP extends LinearOpMode {
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
+        reset_angle = 0;
+        dc_power_state = 1.0;
+        dc_power_time = 0.0;
+        rot_power_state = 0.4;
+        rot_power_time = 0.0;
 
         // Servos for little arms
         left_arm = hardwareMap.servo.get("left_arm");
@@ -123,12 +134,24 @@ public class TeleWARP extends LinearOpMode {
             // Controlling holonomic drive.
             double x = gamepad1.left_stick_x;
             double y = -gamepad1.left_stick_y;  // for some reason y-component opposite of Descartes
+
+            if (gamepad1.left_stick_button && (dc_power_time < time - 0.5)) {
+                if (dc_power_state == 1.0) {
+                    dc_power_state = 0.5;
+                } else {
+                    dc_power_state = 1.0;
+                }
+            }
+
+
             double theta = Math.atan2(y, x);
             double r = Math.sqrt(x*x + y*y);
 
             Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
             double gyro = angles.firstAngle;
-            double angle = theta - gyro;  // for some reason gyro is opposite of mathworld
+            if (gamepad1.y) { reset_angle = gyro; }
+            double angle = theta - gyro + reset_angle;  // for some reason gyro is opposite of mathworld
+
             double rotate = gamepad1.right_stick_x/3;  // rescale to slow it down.
 
             // (cos, sin) = ne(1, 1) + nw(-1, 1)
@@ -144,6 +167,10 @@ public class TeleWARP extends LinearOpMode {
                 nw /= lambda;
             }
 
+            // scaling by power reducer
+            ne /= dc_power_state;
+            nw /= dc_power_state;
+
             front_left_wheel.setPower(ne + rotate);
             front_right_wheel.setPower(-nw + rotate);
             back_right_wheel.setPower(-ne + rotate);
@@ -151,7 +178,6 @@ public class TeleWARP extends LinearOpMode {
 
 
             // Little arms
-
             if (gamepad1.x && (small_arms_down_time < time - 0.5)) {
                 small_arms_down_state = !small_arms_down_state;
                 small_arms_down_time = time;
@@ -178,7 +204,7 @@ public class TeleWARP extends LinearOpMode {
 
 
             // Set a delay so that the platform state cannot be changed more often than every 0.5s.
-            if (gamepad1.y && (platform_time < time - 0.5)) {
+            if (gamepad1.b && (platform_time < time - 0.5)) {
                 platform_state = !platform_state;
                 platform_time = time;
             }
@@ -193,15 +219,15 @@ public class TeleWARP extends LinearOpMode {
 
 
             // Controlling the big arm.
-            if (gamepad1.left_trigger > 0) {
-                big_arm.setPower(0.2 * gamepad1.left_trigger);
-            } else if (gamepad1.right_trigger > 0) {
-                big_arm.setPower(- 0.2 * gamepad1.right_trigger);
+            if (gamepad1.right_trigger > 0) {
+                big_arm.setPower(gamepad1.right_trigger);
+            } else if (gamepad1.left_trigger > 0) {
+                big_arm.setPower(- gamepad1.left_trigger);
             } else {
                 big_arm.setPower(0);
             }
             // Using a delay to set the wrist grabber.
-            if (gamepad1.b && (wrist_time < time - 0.5)) {
+            if (gamepad1.a && (wrist_time < time - 0.5)) {
                 wrist_state = !wrist_state;
                 wrist_time = time;
             }
