@@ -1,11 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
 import android.graphics.Color;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -55,8 +53,8 @@ public class AutoWARPRedBlocks extends LinearOpMode {
         right_arm = hardwareMap.servo.get("right_arm");
         left_arm.setDirection(Servo.Direction.FORWARD);
         right_arm.setDirection(Servo.Direction.REVERSE);
-        left_arm.setPosition(0);
-        right_arm.setPosition(0);
+        left_arm.setPosition(.1);
+        right_arm.setPosition(.1);
         sleep(500);
 
         // Sensors
@@ -71,12 +69,6 @@ public class AutoWARPRedBlocks extends LinearOpMode {
 
         // Going to the blocks initially. Finding the first black block.
         if (opModeIsActive()) {
-            left_arm.setPosition(0);
-            right_arm.setPosition(0);
-            sleep(10000);
-
-
-
 
             goLeft(2240);
             while (true) {
@@ -90,7 +82,7 @@ public class AutoWARPRedBlocks extends LinearOpMode {
             }
 
             // Grabbing the black block and moving back toward fence.
-            right_arm.setPosition(0.70);
+            right_arm.setPosition(0.75);
             sleep(1000);
             goRight(800);
 
@@ -114,7 +106,7 @@ public class AutoWARPRedBlocks extends LinearOpMode {
             }
 
             // Grabbing the black block and moving back toward fence.
-            right_arm.setPosition(0.70);
+            right_arm.setPosition(0.75);
             sleep(1000);
             goRight(600);
 
@@ -129,8 +121,8 @@ public class AutoWARPRedBlocks extends LinearOpMode {
 
             // Doing some stuff to get ready for autonomous
             goLeft(1000);
-            right_arm.setPosition(0.4);
-            left_arm.setPosition(0.4);
+            right_arm.setPosition(0.5);
+            left_arm.setPosition(0.45);
         }
     }
 

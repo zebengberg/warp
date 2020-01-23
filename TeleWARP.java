@@ -137,9 +137,17 @@ public class TeleWARP extends LinearOpMode {
 
             if (gamepad1.left_stick_button && (dc_power_time < time - 0.5)) {
                 if (dc_power_state == 1.0) {
-                    dc_power_state = 0.5;
+                    dc_power_state = 0.3;
                 } else {
                     dc_power_state = 1.0;
+                }
+            }
+
+            if (gamepad1.right_stick_button && (dc_power_time < time - 0.5)) {
+                if (rot_power_state == 0.4) {
+                    dc_power_state = 0.15;
+                } else {
+                    dc_power_state = 0.4;
                 }
             }
 
@@ -152,14 +160,14 @@ public class TeleWARP extends LinearOpMode {
             if (gamepad1.y) { reset_angle = gyro; }
             double angle = theta - gyro + reset_angle;  // for some reason gyro is opposite of mathworld
 
-            double rotate = gamepad1.right_stick_x/3;  // rescale to slow it down.
+            double rotate = gamepad1.right_stick_x * rot_power_state;  // rescale to slow it down.
 
             // (cos, sin) = ne(1, 1) + nw(-1, 1)
             // Now dot with sides with (1, 1) and (-1, 1), then rescale.
             double ne = Math.cos(angle) + Math.sin(angle);  // component in NE direction
             double nw = -Math.cos(angle) + Math.sin(angle);  // component in NW direction
-            ne *= r;  //scale
-            nw *= r;
+            ne *= r * dc_power_state;  //scale
+            nw *= r * dc_power_state;
             // may still need to scale to adjust for rotate
             double lambda = Math.max(Math.abs(ne), Math.abs(nw)) + Math.abs(rotate);
             if (lambda > 1) {
@@ -167,9 +175,6 @@ public class TeleWARP extends LinearOpMode {
                 nw /= lambda;
             }
 
-            // scaling by power reducer
-            ne /= dc_power_state;
-            nw /= dc_power_state;
 
             front_left_wheel.setPower(ne + rotate);
             front_right_wheel.setPower(-nw + rotate);
