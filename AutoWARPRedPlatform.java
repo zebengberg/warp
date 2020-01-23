@@ -55,28 +55,32 @@ public class AutoWARPRedPlatform extends LinearOpMode {
         if (opModeIsActive()) {
 
             // Moving to platform.
-            goRight(500);
-            goBack(1000);
-            goRight(2150);
+            goRight(2400);
+            goForward(450);
+
+
             left_platform.setPosition(0.4);
-            right_platform.setPosition(0.5);
+            right_platform.setPosition(0.45);
             sleep(1000);
 
             // Dragging platform
-            goLeft(2000);
-            rotateCW(2500);
-            goRight(500);
+            goBack(100);
+            rotateCCW(450);
+            goLeft(1025);
+            rotateCCW(1000);
+
+            goForward(1500);
+            goRight(290);
+            rotateCCW(300);
+            goRight(460);
             left_platform.setPosition(0);
             right_platform.setPosition(0);
             sleep(1000);
 
-
             // going under the bridge
-            goBack(200);
+            goForward(400);
             goLeft(3000);
-            goBack(200);
-            goLeft(1000);
-            goBack(200);
+
         }
     }
 

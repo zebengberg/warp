@@ -70,7 +70,7 @@ public class AutoWARPRedBlocks extends LinearOpMode {
         // Going to the blocks initially. Finding the first black block.
         if (opModeIsActive()) {
 
-            goLeft(2240);
+            goLeft(2220);
             while (true) {
                 if (isYellow() & block_count < 2) {
                     goForward(block_size);
@@ -108,7 +108,7 @@ public class AutoWARPRedBlocks extends LinearOpMode {
             // Grabbing the black block and moving back toward fence.
             right_arm.setPosition(0.75);
             sleep(1000);
-            goRight(600);
+            goRight(800);
 
             // Going under the skystone bridge and releasing block.
             goBack(2000 + block_count * block_size);
