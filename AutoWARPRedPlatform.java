@@ -10,14 +10,14 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 @Autonomous
 public class AutoWARPRedPlatform extends LinearOpMode {
-    DcMotor front_left_wheel;
-    DcMotor back_left_wheel;
-    DcMotor back_right_wheel;
-    DcMotor front_right_wheel;
-    DcMotor[] motors;
+    private DcMotor front_left_wheel;
+    private DcMotor back_left_wheel;
+    private DcMotor back_right_wheel;
+    private DcMotor front_right_wheel;
+    private DcMotor[] motors;
 
-    Servo left_platform;
-    Servo right_platform;
+    private Servo left_platform;
+    private Servo right_platform;
 
 
 

@@ -137,7 +137,7 @@ public class TeleWARP extends LinearOpMode {
 
             if (gamepad1.left_stick_button && (dc_power_time < time - 0.5)) {
                 if (dc_power_state == 1.0) {
-                    dc_power_state = 0.3;
+                    dc_power_state = 0.2;
                 } else {
                     dc_power_state = 1.0;
                 }
@@ -145,7 +145,7 @@ public class TeleWARP extends LinearOpMode {
 
             if (gamepad1.right_stick_button && (dc_power_time < time - 0.5)) {
                 if (rot_power_state == 0.4) {
-                    dc_power_state = 0.15;
+                    dc_power_state = 0.1;
                 } else {
                     dc_power_state = 0.4;
                 }
@@ -158,7 +158,7 @@ public class TeleWARP extends LinearOpMode {
             Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
             double gyro = angles.firstAngle;
             if (gamepad1.y) { reset_angle = gyro; }
-            double angle = theta - gyro + reset_angle;  // for some reason gyro is opposite of mathworld
+            double angle = theta - gyro + reset_angle;  // for some reason gyro is opposite of math
 
             double rotate = gamepad1.right_stick_x * rot_power_state;  // rescale to slow it down.
 
