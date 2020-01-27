@@ -47,6 +47,10 @@ public class TeleWARP extends LinearOpMode {
     private boolean wrist_state;
     private double wrist_time;
 
+    private Servo capstone;
+    private double[] capstone_states;
+    private int capstone_state;
+    private double capstone_time;
 
     BNO055IMU imu;
 
@@ -102,7 +106,11 @@ public class TeleWARP extends LinearOpMode {
         wrist_state = false;
         wrist_time = 0.0;
 
-
+        // Motors for capstone arm.
+        capstone = hardwareMap.servo.get("capstone");
+        capstone_states = new double[] {0.0, 0.4, 0.5, 0.6};
+        capstone_state = 0;
+        capstone_time = 0.0;
 
         // IMU DEVICE
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -143,11 +151,11 @@ public class TeleWARP extends LinearOpMode {
                 }
             }
 
-            if (gamepad1.right_stick_button && (dc_power_time < time - 0.5)) {
+            if (gamepad1.right_stick_button && (rot_power_time < time - 0.5)) {
                 if (rot_power_state == 0.4) {
-                    dc_power_state = 0.1;
+                    rot_power_state = 0.1;
                 } else {
-                    dc_power_state = 0.4;
+                    rot_power_state = 0.4;
                 }
             }
 
@@ -243,6 +251,20 @@ public class TeleWARP extends LinearOpMode {
                 wrist.setPosition(0);
             }
 
+            if (gamepad1.dpad_up && (capstone_time < time - 0.5)) {
+                if (capstone_state < 3) {
+                    capstone_state++;
+                    capstone_time = 0.0;
+                }
+            } else if (gamepad1.dpad_down && (capstone_time < time - 0.5)) {
+                if (capstone_state > 0) {
+                    capstone_state--;
+                    capstone_time = 0.0;
+                }
+            }
+            capstone.setPosition(capstone_states[capstone_state]);
+
+
             telemetry.addData("Front Left ", front_left_wheel.getPower());
             telemetry.addData("Front Right", front_right_wheel.getPower());
             telemetry.addData("Back Left  ", back_left_wheel.getPower());
@@ -252,6 +274,7 @@ public class TeleWARP extends LinearOpMode {
             telemetry.addData("Right Arm", right_arm.getPosition());
             telemetry.addData("Big Arm", big_arm.getPower());
             telemetry.addData("Wrist", wrist.getPosition());
+            telemetry.addData("Capstone", capstone.getPosition());
             telemetry.update();
         }
     }
