@@ -27,9 +27,8 @@ public class TeleWARP extends LinearOpMode {
     private DcMotor[] motors;
     private double reset_angle;
     private double dc_power_state;
-    private double dc_power_time;
     private double rot_power_state;
-    private double rot_power_time;
+    private double left_stick_button_time;
 
 
     private Servo left_arm;
@@ -52,7 +51,7 @@ public class TeleWARP extends LinearOpMode {
     private int capstone_state;
     private double capstone_time;
 
-    BNO055IMU imu;
+    private BNO055IMU imu;
 
 
     @Override
@@ -75,9 +74,8 @@ public class TeleWARP extends LinearOpMode {
         }
         reset_angle = 0;
         dc_power_state = 1.0;
-        dc_power_time = 0.0;
         rot_power_state = 0.4;
-        rot_power_time = 0.0;
+        left_stick_button_time = 0.0;
 
         // Servos for little arms
         left_arm = hardwareMap.servo.get("left_arm");
@@ -110,7 +108,7 @@ public class TeleWARP extends LinearOpMode {
         capstone = hardwareMap.servo.get("capstone");
         capstone.setDirection(Servo.Direction.REVERSE);
         capstone.setPosition(0);
-        capstone_states = new double[] {0.0, 0.4, 0.45, 0.6};
+        capstone_states = new double[] {0.0, 0.3, 0.35, 0.4, 0.425, 0.5};
         capstone_state = 0;
         capstone_time = 0.0;
 
@@ -145,18 +143,12 @@ public class TeleWARP extends LinearOpMode {
             double x = gamepad1.left_stick_x;
             double y = -gamepad1.left_stick_y;  // for some reason y-component opposite of Descartes
 
-            if (gamepad1.left_stick_button && (dc_power_time < time - 0.5)) {
+            if (gamepad1.left_stick_button && (left_stick_button_time < time - 0.5)) {
                 if (dc_power_state == 1.0) {
-                    dc_power_state = 0.2;
-                } else {
-                    dc_power_state = 1.0;
-                }
-            }
-
-            if (gamepad1.right_stick_button && (rot_power_time < time - 0.5)) {
-                if (rot_power_state == 0.4) {
+                    dc_power_state = 0.3;
                     rot_power_state = 0.1;
                 } else {
+                    dc_power_state = 1.0;
                     rot_power_state = 0.4;
                 }
             }
@@ -234,13 +226,8 @@ public class TeleWARP extends LinearOpMode {
 
 
             // Controlling the big arm.
-            if (gamepad1.right_trigger > 0) {
-                big_arm.setPower(gamepad1.right_trigger);
-            } else if (gamepad1.left_trigger > 0) {
-                big_arm.setPower(- gamepad1.left_trigger);
-            } else {
-                big_arm.setPower(0);
-            }
+            big_arm.setPower(-gamepad1.right_stick_y);
+
             // Using a delay to set the wrist grabber.
             if (gamepad1.a && (wrist_time < time - 0.5)) {
                 wrist_state = !wrist_state;
@@ -253,12 +240,12 @@ public class TeleWARP extends LinearOpMode {
                 wrist.setPosition(0);
             }
 
-            if (gamepad1.dpad_up && (capstone_time < time - 0.5)) {
-                if (capstone_state < 3) {
+            if (gamepad1.dpad_up && (capstone_time < time - 0.2)) {
+                if (capstone_state < capstone_states.length - 1) {
                     capstone_state++;
                     capstone_time = time;
                 }
-            } else if (gamepad1.dpad_down && (capstone_time < time - 0.5)) {
+            } else if (gamepad1.dpad_down && (capstone_time < time - 0.2)) {
                 if (capstone_state > 0) {
                     capstone_state--;
                     capstone_time = time;
