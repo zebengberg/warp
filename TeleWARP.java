@@ -103,12 +103,14 @@ public class TeleWARP extends LinearOpMode {
         // Motors for big arm.
         big_arm = hardwareMap.dcMotor.get("big_arm");
         wrist = hardwareMap.servo.get("wrist");
-        wrist_state = false;
+        wrist_state = true;
         wrist_time = 0.0;
 
         // Motors for capstone arm.
         capstone = hardwareMap.servo.get("capstone");
-        capstone_states = new double[] {0.0, 0.4, 0.5, 0.6};
+        capstone.setDirection(Servo.Direction.REVERSE);
+        capstone.setPosition(0);
+        capstone_states = new double[] {0.0, 0.4, 0.45, 0.6};
         capstone_state = 0;
         capstone_time = 0.0;
 
@@ -254,12 +256,12 @@ public class TeleWARP extends LinearOpMode {
             if (gamepad1.dpad_up && (capstone_time < time - 0.5)) {
                 if (capstone_state < 3) {
                     capstone_state++;
-                    capstone_time = 0.0;
+                    capstone_time = time;
                 }
             } else if (gamepad1.dpad_down && (capstone_time < time - 0.5)) {
                 if (capstone_state > 0) {
                     capstone_state--;
-                    capstone_time = 0.0;
+                    capstone_time = time;
                 }
             }
             capstone.setPosition(capstone_states[capstone_state]);

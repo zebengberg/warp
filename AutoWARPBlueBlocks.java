@@ -69,9 +69,10 @@ public class AutoWARPBlueBlocks extends LinearOpMode {
         // Going to the blocks initially. Finding the first black block.
         if (opModeIsActive()) {
 
-            goLeft(2220);
+            goLeft(2250);
             while (true) {
                 if (isYellow() & block_count < 2) {
+                    rotateCW(40);
                     goBack(block_size);
                     block_count++;
                 } else {
@@ -94,9 +95,9 @@ public class AutoWARPBlueBlocks extends LinearOpMode {
             block_count += 3;
 
             // Going back to the blocks. Finding a black one.
-            goBack(1775 + block_count * block_size);
-            goLeft(800);
-            goBack(100);
+            goBack(1825 + block_count * block_size);
+            goLeft(850);
+            sleep(500);
             while (true) {
                 if (isYellow()) {
                     goBack(block_size/2);
