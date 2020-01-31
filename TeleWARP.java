@@ -143,10 +143,10 @@ public class TeleWARP extends LinearOpMode {
             double x = gamepad1.left_stick_x;
             double y = -gamepad1.left_stick_y;  // for some reason y-component opposite of Descartes
 
-            if (gamepad1.left_stick_button || gamepad1.right_stick_button) {
+            if (gamepad1.right_trigger > 0) {
                 dc_power_state = 0.3;
                 rot_power_state = 0.2;
-                big_arm_power_state = 0.5;
+                big_arm_power_state = 0.3;
             } else {
                 dc_power_state = 1.0;
                 rot_power_state = 0.4;
