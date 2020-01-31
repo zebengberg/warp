@@ -28,7 +28,6 @@ public class TeleWARP extends LinearOpMode {
     private double reset_angle;
     private double dc_power_state;
     private double rot_power_state;
-    private double left_stick_button_time;
 
 
     private Servo left_arm;
@@ -42,6 +41,7 @@ public class TeleWARP extends LinearOpMode {
     private double platform_time;
 
     private DcMotor big_arm;
+    private double big_arm_power_state;
     private Servo wrist;
     private boolean wrist_state;
     private double wrist_time;
@@ -75,7 +75,6 @@ public class TeleWARP extends LinearOpMode {
         reset_angle = 0;
         dc_power_state = 1.0;
         rot_power_state = 0.4;
-        left_stick_button_time = 0.0;
 
         // Servos for little arms
         left_arm = hardwareMap.servo.get("left_arm");
@@ -100,6 +99,7 @@ public class TeleWARP extends LinearOpMode {
 
         // Motors for big arm.
         big_arm = hardwareMap.dcMotor.get("big_arm");
+        big_arm_power_state = 1.0;
         wrist = hardwareMap.servo.get("wrist");
         wrist_state = true;
         wrist_time = 0.0;
@@ -143,14 +143,14 @@ public class TeleWARP extends LinearOpMode {
             double x = gamepad1.left_stick_x;
             double y = -gamepad1.left_stick_y;  // for some reason y-component opposite of Descartes
 
-            if (gamepad1.left_stick_button && (left_stick_button_time < time - 0.5)) {
-                if (dc_power_state == 1.0) {
-                    dc_power_state = 0.3;
-                    rot_power_state = 0.1;
-                } else {
-                    dc_power_state = 1.0;
-                    rot_power_state = 0.4;
-                }
+            if (gamepad1.left_stick_button || gamepad1.right_stick_button) {
+                dc_power_state = 0.3;
+                rot_power_state = 0.2;
+                big_arm_power_state = 0.5;
+            } else {
+                dc_power_state = 1.0;
+                rot_power_state = 0.4;
+                big_arm_power_state = 1.0;
             }
 
 
@@ -226,7 +226,13 @@ public class TeleWARP extends LinearOpMode {
 
 
             // Controlling the big arm.
-            big_arm.setPower(-gamepad1.right_stick_y);
+            if (gamepad1.right_stick_y > 0.5) {
+                big_arm.setPower((-2 * gamepad1.right_stick_y + 1) * big_arm_power_state);
+            } else if (gamepad1.right_stick_y < -0.5) {
+                big_arm.setPower((-2 * gamepad1.right_stick_y - 1) * big_arm_power_state);
+            } else {
+                  big_arm.setPower(0);
+            }
 
             // Using a delay to set the wrist grabber.
             if (gamepad1.a && (wrist_time < time - 0.5)) {

@@ -123,11 +123,7 @@ public class AutoWARPRedBlocks extends LinearOpMode {
 
             // Going to sky bridge tape.
             goForward(1100);
-
-            // Doing some stuff to get ready for autonomous
             goLeft(1000);
-            right_arm.setPosition(0.5);
-            left_arm.setPosition(0.45);
         }
     }
 

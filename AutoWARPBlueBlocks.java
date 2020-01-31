@@ -127,11 +127,7 @@ public class AutoWARPBlueBlocks extends LinearOpMode {
 
             // Going to sky bridge tape.
             goBack(1100);
-
-            // Doing some stuff to get ready for autonomous
             goLeft(900);
-            right_arm.setPosition(0.5);
-            left_arm.setPosition(0.45);
         }
     }
 
