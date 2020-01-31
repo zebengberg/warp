@@ -18,6 +18,7 @@ public class AutoWARPRedPlatform extends LinearOpMode {
 
     private Servo left_platform;
     private Servo right_platform;
+    private Servo capstone;
 
 
 
@@ -49,6 +50,11 @@ public class AutoWARPRedPlatform extends LinearOpMode {
         left_platform.setPosition(0);
         right_platform.setPosition(0);
 
+        // Lower the capstone servo
+        capstone = hardwareMap.servo.get("capstone");
+        capstone.setDirection(Servo.Direction.REVERSE);
+        capstone.setPosition(0);
+
         // wait for start button
         waitForStart();
 
@@ -65,27 +71,26 @@ public class AutoWARPRedPlatform extends LinearOpMode {
 
             // Dragging platform
             goBack(100);
-            rotateCCW(450);
+            rotateCCW(425);
             goLeft(1025);
-            rotateCCW(1000);
+            rotateCCW(1025);
 
-            goForward(1500);
-            goRight(290);
-            rotateCCW(300);
-            goRight(460);
+            goForward(1915);
+            rotateCCW(380);
             left_platform.setPosition(0);
             right_platform.setPosition(0);
             sleep(1000);
 
             // going under the bridge
-            goForward(400);
+            rotateCW(80);
             goLeft(3000);
+            goForward(175);
 
         }
     }
 
 
-    public void rotateCW(int position) {
+    private void rotateCW(int position) {
         front_right_wheel.setTargetPosition(position);
         front_left_wheel.setTargetPosition(position);
         back_left_wheel.setTargetPosition(position);
@@ -95,8 +100,7 @@ public class AutoWARPRedPlatform extends LinearOpMode {
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
-        while ((front_left_wheel.isBusy() || front_right_wheel.isBusy() || back_right_wheel.isBusy()
-                || back_left_wheel.isBusy()) && opModeIsActive()) {
+        while ((busyCounter() >= 2) && opModeIsActive()) {
             telemetry.addData("target position", position);
             for (DcMotor motor : motors) {
                 telemetry.addData(motor.getDeviceName(), motor.getCurrentPosition());
@@ -110,7 +114,7 @@ public class AutoWARPRedPlatform extends LinearOpMode {
         }
     }
 
-    public void rotateCCW(int position) {
+    private void rotateCCW(int position) {
         front_right_wheel.setTargetPosition(-position);
         front_left_wheel.setTargetPosition(-position);
         back_left_wheel.setTargetPosition(-position);
@@ -120,8 +124,7 @@ public class AutoWARPRedPlatform extends LinearOpMode {
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
-        while ((front_left_wheel.isBusy() || front_right_wheel.isBusy() || back_right_wheel.isBusy()
-                || back_left_wheel.isBusy()) && opModeIsActive()) {
+        while ((busyCounter() >= 2) && opModeIsActive()) {
             telemetry.addData("target position", position);
             for (DcMotor motor : motors) {
                 telemetry.addData(motor.getDeviceName(), motor.getCurrentPosition());
@@ -136,7 +139,7 @@ public class AutoWARPRedPlatform extends LinearOpMode {
     }
 
 
-    public void goForward(int position) {
+    private void goForward(int position) {
         front_right_wheel.setTargetPosition(-position);
         front_left_wheel.setTargetPosition(position);
         back_left_wheel.setTargetPosition(position);
@@ -146,8 +149,7 @@ public class AutoWARPRedPlatform extends LinearOpMode {
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
-        while ((front_left_wheel.isBusy() || front_right_wheel.isBusy() || back_right_wheel.isBusy()
-                || back_left_wheel.isBusy()) && opModeIsActive()) {
+        while ((busyCounter() >= 2) && opModeIsActive()) {
             telemetry.addData("target position", position);
             for (DcMotor motor : motors) {
                 telemetry.addData(motor.getDeviceName(), motor.getCurrentPosition());
@@ -161,7 +163,7 @@ public class AutoWARPRedPlatform extends LinearOpMode {
         }
     }
 
-    public void goRight(int position) {
+    private void goRight(int position) {
         front_right_wheel.setTargetPosition(position);
         front_left_wheel.setTargetPosition(position);
         back_left_wheel.setTargetPosition(-position);
@@ -171,8 +173,7 @@ public class AutoWARPRedPlatform extends LinearOpMode {
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
-        while ((front_left_wheel.isBusy() || front_right_wheel.isBusy() || back_right_wheel.isBusy()
-                || back_left_wheel.isBusy()) && opModeIsActive()) {
+        while ((busyCounter() >= 2) && opModeIsActive()) {
             telemetry.addData("target position", position);
             for (DcMotor motor : motors) {
                 telemetry.addData(motor.getDeviceName(), motor.getCurrentPosition());
@@ -186,7 +187,7 @@ public class AutoWARPRedPlatform extends LinearOpMode {
         }
     }
 
-    public void goLeft(int position) {
+    private void goLeft(int position) {
         front_right_wheel.setTargetPosition(-position);
         front_left_wheel.setTargetPosition(-position);
         back_left_wheel.setTargetPosition(position);
@@ -196,8 +197,7 @@ public class AutoWARPRedPlatform extends LinearOpMode {
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
-        while ((front_left_wheel.isBusy() || front_right_wheel.isBusy() || back_right_wheel.isBusy()
-                || back_left_wheel.isBusy()) && opModeIsActive()) {
+        while ((busyCounter() >= 2) && opModeIsActive()) {
             telemetry.addData("target position", position);
             for (DcMotor motor : motors) {
                 telemetry.addData(motor.getDeviceName(), motor.getCurrentPosition());
@@ -211,7 +211,7 @@ public class AutoWARPRedPlatform extends LinearOpMode {
         }
     }
 
-    public void goBack(int position) {
+    private void goBack(int position) {
         front_right_wheel.setTargetPosition(position);
         front_left_wheel.setTargetPosition(-position);
         back_left_wheel.setTargetPosition(-position);
@@ -221,8 +221,7 @@ public class AutoWARPRedPlatform extends LinearOpMode {
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
-        while ((front_left_wheel.isBusy() || front_right_wheel.isBusy() || back_right_wheel.isBusy()
-                || back_left_wheel.isBusy()) && opModeIsActive()) {
+        while ((busyCounter() >= 2) && opModeIsActive()) {
             telemetry.addData("target position", position);
             for (DcMotor motor : motors) {
                 telemetry.addData(motor.getDeviceName(), motor.getCurrentPosition());
@@ -234,6 +233,16 @@ public class AutoWARPRedPlatform extends LinearOpMode {
             motor.setPower(0);
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
+    }
+
+    private int busyCounter() {
+        int busyCount = 0;
+        for (DcMotor motor : motors) {
+            if (motor.isBusy()) {
+                busyCount++;
+            }
+        }
+        return busyCount;
     }
 }
 

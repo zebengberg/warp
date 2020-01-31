@@ -20,6 +20,7 @@ public class AutoWARPBlueBlocks extends LinearOpMode {
 
     private Servo right_arm;
     private Servo left_arm;
+    private Servo capstone;
     private ColorSensor left_color;
 
     // Creating a macro for speed of DC motors.
@@ -59,12 +60,17 @@ public class AutoWARPBlueBlocks extends LinearOpMode {
         // Sensors
         left_color = hardwareMap.get(ColorSensor.class, "left_color");
 
+        // Lower the capstone servo
+        capstone = hardwareMap.servo.get("capstone");
+        capstone.setDirection(Servo.Direction.REVERSE);
+        capstone.setPosition(0);
+
 
         // wait for start button
         waitForStart();
 
         int block_count = 0;
-        int block_size = 710;
+        int block_size = 708;
 
         // Going to the blocks initially. Finding the first black block.
         if (opModeIsActive()) {
@@ -72,7 +78,7 @@ public class AutoWARPBlueBlocks extends LinearOpMode {
             goLeft(2250);
             while (true) {
                 if (isYellow() & block_count < 2) {
-                    rotateCW(40);
+                    rotateCW(30);
                     goBack(block_size);
                     block_count++;
                 } else {
@@ -85,31 +91,33 @@ public class AutoWARPBlueBlocks extends LinearOpMode {
             left_arm.setPosition(0.68);
             sleep(750);
             goRight(950);
-            rotateCW(50);
+            rotateCW(40);
 
             // Going under the skystone bridge. Releasing block. Moving back toward fence a hair.
             goForward(2250 + block_count * block_size);
             left_arm.setPosition(0);
             sleep(750);
-            rotateCW(50);
+            rotateCW(40);
             block_count += 3;
 
             // Going back to the blocks. Finding a black one.
-            goBack(1825 + block_count * block_size);
-            goLeft(850);
+            goBack(1850 + block_count * block_size);
+            goLeft(950);
+            rotateCCW(100);
             sleep(500);
             while (true) {
                 if (isYellow()) {
-                    goBack(block_size/2);
+                    goBack(block_size / 2);
                 } else {
                     break;
                 }
             }
 
+
             // Grabbing the black block and moving back toward fence.
             left_arm.setPosition(0.68);
             sleep(750);
-            goRight(800);
+            goRight(1400);
 
             // Going under the skystone bridge and releasing block.
             goForward(2000 + block_count * block_size);
@@ -121,7 +129,7 @@ public class AutoWARPBlueBlocks extends LinearOpMode {
             goBack(1100);
 
             // Doing some stuff to get ready for autonomous
-            goLeft(1100);
+            goLeft(900);
             right_arm.setPosition(0.5);
             left_arm.setPosition(0.45);
         }
@@ -134,7 +142,7 @@ public class AutoWARPBlueBlocks extends LinearOpMode {
         return (hue < 90);
     }
 
-    public void rotateCW(int position) {
+    private void rotateCW(int position) {
         front_right_wheel.setTargetPosition(position);
         front_left_wheel.setTargetPosition(position);
         back_left_wheel.setTargetPosition(position);
@@ -144,8 +152,7 @@ public class AutoWARPBlueBlocks extends LinearOpMode {
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
-        while ((front_left_wheel.isBusy() || front_right_wheel.isBusy() || back_right_wheel.isBusy()
-                || back_left_wheel.isBusy()) && opModeIsActive()) {
+        while ((busyCounter() >= 2) && opModeIsActive()) {
             telemetry.addData("target position", position);
             for (DcMotor motor : motors) {
                 telemetry.addData(motor.getDeviceName(), motor.getCurrentPosition());
@@ -159,7 +166,7 @@ public class AutoWARPBlueBlocks extends LinearOpMode {
         }
     }
 
-    public void rotateCCW(int position) {
+    private void rotateCCW(int position) {
         front_right_wheel.setTargetPosition(-position);
         front_left_wheel.setTargetPosition(-position);
         back_left_wheel.setTargetPosition(-position);
@@ -169,8 +176,7 @@ public class AutoWARPBlueBlocks extends LinearOpMode {
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
-        while ((front_left_wheel.isBusy() || front_right_wheel.isBusy() || back_right_wheel.isBusy()
-                || back_left_wheel.isBusy()) && opModeIsActive()) {
+        while ((busyCounter() >= 2) && opModeIsActive()) {
             telemetry.addData("target position", position);
             for (DcMotor motor : motors) {
                 telemetry.addData(motor.getDeviceName(), motor.getCurrentPosition());
@@ -194,8 +200,7 @@ public class AutoWARPBlueBlocks extends LinearOpMode {
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
-        while ((front_left_wheel.isBusy() || front_right_wheel.isBusy() || back_right_wheel.isBusy()
-                || back_left_wheel.isBusy()) && opModeIsActive()) {
+        while ((busyCounter() >= 2) && opModeIsActive()) {
             telemetry.addData("target position", position);
             telemetry.addData("front left", front_left_wheel.getCurrentPosition());
             telemetry.addData("front right", front_right_wheel.getCurrentPosition());
@@ -219,8 +224,7 @@ public class AutoWARPBlueBlocks extends LinearOpMode {
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
-        while ((front_left_wheel.isBusy() || front_right_wheel.isBusy() || back_right_wheel.isBusy()
-                || back_left_wheel.isBusy()) && opModeIsActive()) {
+        while ((busyCounter() >= 2) && opModeIsActive()) {
             telemetry.addData("target position", position);
             telemetry.addData("front left", front_left_wheel.getCurrentPosition());
             telemetry.addData("front right", front_right_wheel.getCurrentPosition());
@@ -244,8 +248,7 @@ public class AutoWARPBlueBlocks extends LinearOpMode {
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
-        while ((front_left_wheel.isBusy() || front_right_wheel.isBusy() || back_right_wheel.isBusy()
-                || back_left_wheel.isBusy()) && opModeIsActive()) {
+        while ((busyCounter() >= 2) && opModeIsActive()) {
             telemetry.addData("target position", position);
             telemetry.addData("front left", front_left_wheel.getCurrentPosition());
             telemetry.addData("front right", front_right_wheel.getCurrentPosition());
@@ -269,8 +272,7 @@ public class AutoWARPBlueBlocks extends LinearOpMode {
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
-        while ((front_left_wheel.isBusy() || front_right_wheel.isBusy() || back_right_wheel.isBusy()
-                || back_left_wheel.isBusy()) && opModeIsActive()) {
+        while ((busyCounter() >= 2) && opModeIsActive()) {
             telemetry.addData("target position", position);
             telemetry.addData("front left", front_left_wheel.getCurrentPosition());
             telemetry.addData("front right", front_right_wheel.getCurrentPosition());
@@ -282,5 +284,15 @@ public class AutoWARPBlueBlocks extends LinearOpMode {
             motor.setPower(0);
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
+    }
+
+    private int busyCounter() {
+        int busyCount = 0;
+        for (DcMotor motor : motors) {
+            if (motor.isBusy()) {
+                busyCount++;
+            }
+        }
+        return busyCount;
     }
 }

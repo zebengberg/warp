@@ -21,6 +21,7 @@ public class AutoWARPRedBlocks extends LinearOpMode {
     private Servo right_arm;
     private Servo left_arm;
     private ColorSensor right_color;
+    private Servo capstone;
 
     // Creating a macro for speed of DC motors.
     private double speed = 0.7;
@@ -58,6 +59,11 @@ public class AutoWARPRedBlocks extends LinearOpMode {
 
         // Sensors
         right_color = hardwareMap.get(ColorSensor.class, "right_color");
+
+        // Lower the capstone servo
+        capstone = hardwareMap.servo.get("capstone");
+        capstone.setDirection(Servo.Direction.REVERSE);
+        capstone.setPosition(0);
 
 
         // wait for start button
