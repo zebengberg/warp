@@ -18,14 +18,10 @@ public class AutoWARPBlocksBlueBridge extends LinearOpMode {
     private DcMotor front_right_wheel;
     private DcMotor[] motors;
 
-    private Servo right_arm;
-    private Servo left_arm;
-    private ColorSensor right_color;
-    private Servo capstone;
-
     // Creating a macro for speed of DC motors.
     private double speed = 0.7;
 
+    private ColorSensor right_color;
 
 
     @Override
@@ -49,81 +45,125 @@ public class AutoWARPBlocksBlueBridge extends LinearOpMode {
         }
 
         // Servos for little arms
-        left_arm = hardwareMap.servo.get("left_arm");
-        right_arm = hardwareMap.servo.get("right_arm");
-        left_arm.setDirection(Servo.Direction.FORWARD);
+        Servo right_arm = hardwareMap.servo.get("right_arm");
         right_arm.setDirection(Servo.Direction.REVERSE);
-        left_arm.setPosition(.1);
         right_arm.setPosition(.1);
-        sleep(500);
 
         // Sensors
         right_color = hardwareMap.get(ColorSensor.class, "right_color");
 
-        // Lower the capstone servo
-        capstone = hardwareMap.servo.get("capstone");
+        // Lower the capstone servo in case it was left up
+        Servo capstone = hardwareMap.servo.get("capstone");
         capstone.setDirection(Servo.Direction.REVERSE);
         capstone.setPosition(0);
 
 
-        // wait for start button
         waitForStart();
 
-        int block_count = 0;
-        int block_size = 710;
 
-        // Going to the blocks initially. Finding the first black block.
         if (opModeIsActive()) {
 
+            // Going to the blocks initially. Finding the first black block.
+            int block_count = 0;  // will change to 1, 2, or 3
             goLeft(2220);
-            while (true) {
-                if (isYellow() & block_count < 2) {
-                    goForward(block_size);
-                    block_count++;
-                } else {
-                    block_count++;
-                    break;
-                }
-            }
-
-            // Grabbing the black block and moving back toward fence.
-            right_arm.setPosition(0.75);
-            sleep(1000);
-            goRight(800);
-
-            // Going under the skystone bridge. Releasing block. Moving back toward fence a hair.
-            goBack(2250 + block_count * block_size);
-            right_arm.setPosition(0);
-            sleep(500);
-            goRight(200);
-            block_count += 3;
-
-            // Going back to the blocks. Finding a black one.
-            goForward(1750 + block_count * block_size);
-            goLeft(1150);
-            while (true) {
+            while (block_count < 3) {  // condition to guarantee we don't get stuck here
                 if (isYellow()) {
-                    goForward(200);
+                    goForward(710);
+                    block_count++;
                 } else {
-                    goForward(200);
+                    block_count++;
                     break;
                 }
             }
 
-            // Grabbing the black block and moving back toward fence.
+            // Grabbing the black block.
             right_arm.setPosition(0.75);
             sleep(1000);
+            // Moving back to wall
             goRight(800);
 
-            // Going under the skystone bridge and releasing block.
-            goBack(2000 + block_count * block_size);
-            right_arm.setPosition(0);
-            sleep(500);
-            goRight(200);
+            switch (block_count) {
+                case 1:
+                    // Going under the skystone bridge. Releasing block. Moving back toward fence a hair.
+                    goBack(3000);
+                    right_arm.setPosition(0);
+                    sleep(500);
+                    goRight(200);
 
-            // Going to sky bridge tape.
-            goForward(1100);
-            goLeft(1000);
+                    // Going back to the blocks.
+                    goForward(5130);
+                    goLeft(1150);
+
+                    // Grabbing the black block and moving back toward fence.
+                    right_arm.setPosition(0.75);
+                    sleep(1000);
+                    goRight(800);
+
+                    // Going under the skystone bridge and releasing block.
+                    goBack(5130);
+                    right_arm.setPosition(0);
+                    sleep(500);
+                    goRight(200);
+
+                    // Going to sky bridge tape.
+                    goForward(1100);
+                    goLeft(1000);
+                    break;
+
+                case 2:
+                    // Going under the skystone bridge. Releasing block. Moving back toward fence a hair.
+                    goBack(3710);
+                    right_arm.setPosition(0);
+                    sleep(500);
+                    goRight(200);
+
+                    // Going back to the blocks.
+                    goForward(5840);
+                    goLeft(1150);
+
+                    // Grabbing the black block and moving back toward fence.
+                    right_arm.setPosition(0.75);
+                    sleep(1000);
+                    goRight(800);
+
+                    // Going under the skystone bridge and releasing block.
+                    goBack(5840);
+                    right_arm.setPosition(0);
+                    sleep(500);
+                    goRight(200);
+
+                    // Going to sky bridge tape.
+                    goForward(1100);
+                    goLeft(1000);
+                    break;
+
+                case 3:
+                    // Going under the skystone bridge. Releasing block. Moving back toward fence a hair.
+                    goBack(4420);
+                    right_arm.setPosition(0);
+                    sleep(500);
+                    goRight(200);
+
+                    // Going back to the blocks.
+                    goForward(6550);
+                    goLeft(1150);
+
+                    // Grabbing the black block and moving back toward fence.
+                    right_arm.setPosition(0.75);
+                    sleep(1000);
+                    goRight(800);
+
+                    // Going under the skystone bridge and releasing block.
+                    goBack(6550);
+                    right_arm.setPosition(0);
+                    sleep(500);
+                    goRight(200);
+
+                    // Going to sky bridge tape.
+                    goForward(1100);
+                    goLeft(1000);
+                    break;
+            }
         }
     }
 
@@ -132,6 +172,16 @@ public class AutoWARPBlocksBlueBridge extends LinearOpMode {
         Color.RGBToHSV(right_color.red() * 255, right_color.green() * 255, right_color.blue() * 255, hsv);
         float hue = hsv[0];  // sat = hsv[1] and val = hsv[2]
         return (hue < 90);
+    }
+
+    private int busyCounter() {
+        int busyCount = 0;
+        for (DcMotor motor : motors) {
+            if (motor.isBusy()) {
+                busyCount++;
+            }
+        }
+        return busyCount;
     }
 
 
@@ -145,8 +195,7 @@ public class AutoWARPBlocksBlueBridge extends LinearOpMode {
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
-        while ((front_left_wheel.isBusy() || front_right_wheel.isBusy() || back_right_wheel.isBusy()
-                || back_left_wheel.isBusy()) && opModeIsActive()) {
+        while ((busyCounter() >= 2) && opModeIsActive()) {
             telemetry.addData("target position", position);
             telemetry.addData("front left", front_left_wheel.getCurrentPosition());
             telemetry.addData("front right", front_right_wheel.getCurrentPosition());
@@ -170,8 +219,7 @@ public class AutoWARPBlocksBlueBridge extends LinearOpMode {
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
-        while ((front_left_wheel.isBusy() || front_right_wheel.isBusy() || back_right_wheel.isBusy()
-                || back_left_wheel.isBusy()) && opModeIsActive()) {
+        while ((busyCounter() >= 2) && opModeIsActive()) {
             telemetry.addData("target position", position);
             telemetry.addData("front left", front_left_wheel.getCurrentPosition());
             telemetry.addData("front right", front_right_wheel.getCurrentPosition());
@@ -195,8 +243,7 @@ public class AutoWARPBlocksBlueBridge extends LinearOpMode {
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
-        while ((front_left_wheel.isBusy() || front_right_wheel.isBusy() || back_right_wheel.isBusy()
-                || back_left_wheel.isBusy()) && opModeIsActive()) {
+        while ((busyCounter() >= 2) && opModeIsActive()) {
             telemetry.addData("target position", position);
             telemetry.addData("front left", front_left_wheel.getCurrentPosition());
             telemetry.addData("front right", front_right_wheel.getCurrentPosition());
@@ -220,8 +267,7 @@ public class AutoWARPBlocksBlueBridge extends LinearOpMode {
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
-        while ((front_left_wheel.isBusy() || front_right_wheel.isBusy() || back_right_wheel.isBusy()
-                || back_left_wheel.isBusy()) && opModeIsActive()) {
+        while ((busyCounter() >= 2) && opModeIsActive()) {
             telemetry.addData("target position", position);
             telemetry.addData("front left", front_left_wheel.getCurrentPosition());
             telemetry.addData("front right", front_right_wheel.getCurrentPosition());
