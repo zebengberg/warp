@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 // WARP Dec 2019
 
 @Autonomous
-public class AutoWARPRedBlocks extends LinearOpMode {
+public class AutoWARPBlocksBlueBridge extends LinearOpMode {
     private DcMotor front_left_wheel;
     private DcMotor back_left_wheel;
     private DcMotor back_right_wheel;

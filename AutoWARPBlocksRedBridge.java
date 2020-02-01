@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 // WARP Dec 2019
 
 @Autonomous
-public class AutoWARPBlueBlocks extends LinearOpMode {
+public class AutoWARPBlocksRedBridge extends LinearOpMode {
     private DcMotor front_left_wheel;
     private DcMotor back_left_wheel;
     private DcMotor back_right_wheel;
@@ -91,19 +91,18 @@ public class AutoWARPBlueBlocks extends LinearOpMode {
             left_arm.setPosition(0.68);
             sleep(750);
             goRight(950);
-            rotateCW(40);
+            rotateCW(30);
 
             // Going under the skystone bridge. Releasing block. Moving back toward fence a hair.
             goForward(2250 + block_count * block_size);
             left_arm.setPosition(0);
             sleep(750);
-            rotateCW(40);
+            rotateCW(30);
             block_count += 3;
 
             // Going back to the blocks. Finding a black one.
             goBack(1850 + block_count * block_size);
-            goLeft(950);
-            rotateCCW(100);
+            goLeft(1100);
             sleep(500);
             while (true) {
                 if (isYellow()) {
@@ -115,12 +114,14 @@ public class AutoWARPBlueBlocks extends LinearOpMode {
 
 
             // Grabbing the black block and moving back toward fence.
+            rotateCCW(100);
             left_arm.setPosition(0.68);
             sleep(750);
             goRight(1400);
+            rotateCW(100);
 
             // Going under the skystone bridge and releasing block.
-            goForward(2000 + block_count * block_size);
+            goForward(1900 + block_count * block_size);
             left_arm.setPosition(0);
             sleep(500);
             goRight(200);

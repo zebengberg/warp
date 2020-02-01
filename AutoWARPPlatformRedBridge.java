@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 // WARP Dec 2019
 
 @Autonomous
-public class AutoWARPBluePlatform extends LinearOpMode {
+public class AutoWARPPlatformRedBridge extends LinearOpMode {
     private DcMotor front_left_wheel;
     private DcMotor back_left_wheel;
     private DcMotor back_right_wheel;
@@ -72,19 +72,19 @@ public class AutoWARPBluePlatform extends LinearOpMode {
             // Dragging platform
             goForward(100);
             rotateCW(425);
-            goLeft(1025);
+            goLeft(2000);
             rotateCW(1025);
 
             goBack(1915);
-            rotateCW(380);
+            rotateCW(400);
             left_platform.setPosition(0);
             right_platform.setPosition(0);
             sleep(1000);
+            rotateCCW(100);
 
             // going under the bridge
-            rotateCCW(80);
-            goLeft(3000);
-            goForward(175);
+            goLeft(3200);
+            goBack(400);
 
         }
     }

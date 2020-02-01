@@ -99,7 +99,10 @@ public class TeleWARP extends LinearOpMode {
 
         // Motors for big arm.
         big_arm = hardwareMap.dcMotor.get("big_arm");
+        big_arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        big_arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         big_arm_power_state = 1.0;
+
         wrist = hardwareMap.servo.get("wrist");
         wrist_state = true;
         wrist_time = 0.0;
@@ -226,9 +229,9 @@ public class TeleWARP extends LinearOpMode {
 
 
             // Controlling the big arm.
-            if (gamepad1.right_stick_y > 0.5) {
+            if ((gamepad1.right_stick_y > 0.5) && (big_arm.getCurrentPosition() > -4500)) {
                 big_arm.setPower((-2 * gamepad1.right_stick_y + 1) * big_arm_power_state);
-            } else if (gamepad1.right_stick_y < -0.5) {
+            } else if ((gamepad1.right_stick_y < -0.5) && (big_arm.getCurrentPosition() < 0)) {
                 big_arm.setPower((-2 * gamepad1.right_stick_y - 1) * big_arm_power_state);
             } else {
                   big_arm.setPower(0);
@@ -267,7 +270,8 @@ public class TeleWARP extends LinearOpMode {
             telemetry.addData("Rotation Angle", gyro * 180 / Math.PI); // degrees
             telemetry.addData("Left Arm ", left_arm.getPosition());
             telemetry.addData("Right Arm", right_arm.getPosition());
-            telemetry.addData("Big Arm", big_arm.getPower());
+            telemetry.addData("Big Arm Power", big_arm.getPower());
+            telemetry.addData("Big Arm Encoder", big_arm.getCurrentPosition());
             telemetry.addData("Wrist", wrist.getPosition());
             telemetry.addData("Capstone", capstone.getPosition());
             telemetry.update();
