@@ -82,7 +82,7 @@ public class TeleWARP extends LinearOpMode {
         left_arm.setDirection(Servo.Direction.FORWARD);
         right_arm.setDirection(Servo.Direction.REVERSE);
         left_arm.setPosition(0.45);
-        right_arm.setPosition(0.5);
+        right_arm.setPosition(0.65);
         small_arms_down_state = false;
         small_arms_down_time = 0.0;
 
@@ -203,12 +203,12 @@ public class TeleWARP extends LinearOpMode {
                 }
             }
             if (gamepad1.right_bumper) {
-                right_arm.setPosition(0.75);
+                right_arm.setPosition(0.88);
             } else {
                 if (small_arms_down_state) {
                     right_arm.setPosition(0);
                 } else {
-                    right_arm.setPosition(0.5);
+                    right_arm.setPosition(0.65);
                 }
             }
 

@@ -19,7 +19,7 @@ public class AutoWARPBlocksBlueBridge extends LinearOpMode {
     private DcMotor[] motors;
 
     // Creating a macro for speed of DC motors.
-    private double speed = 0.7;
+    private double speed = 0.75;
 
     private ColorSensor right_color;
 
@@ -78,7 +78,7 @@ public class AutoWARPBlocksBlueBridge extends LinearOpMode {
             }
 
             // Grabbing the black block.
-            right_arm.setPosition(0.75);
+            right_arm.setPosition(0.88);
             sleep(1500);
 
             // Moving back to wall
@@ -88,7 +88,7 @@ public class AutoWARPBlocksBlueBridge extends LinearOpMode {
                 case 1:
                     // Going under the skystone bridge. Releasing block. Moving back toward fence a hair.
                     goBack(3500);
-                    right_arm.setPosition(0);
+                    right_arm.setPosition(.1);
                     sleep(500);
                     goRight(200);
                     rotateCCW(30);
@@ -98,14 +98,14 @@ public class AutoWARPBlocksBlueBridge extends LinearOpMode {
                     goLeft(1180);
 
                     // Grabbing the second black block and moving back toward fence.
-                    right_arm.setPosition(0.75);
+                    right_arm.setPosition(0.88);
                     sleep(1000);
                     goRight(900);
                     rotateCCW(30);
 
                     // Going under the skystone bridge and releasing block.
                     goBack(5580);
-                    right_arm.setPosition(0);
+                    right_arm.setPosition(.1);
                     sleep(500);
                     goRight(200);
 
@@ -117,7 +117,7 @@ public class AutoWARPBlocksBlueBridge extends LinearOpMode {
                 case 2:
                     // Going under the skystone bridge. Releasing block. Moving back toward fence a hair.
                     goBack(4210);
-                    right_arm.setPosition(0);
+                    right_arm.setPosition(.1);
                     sleep(500);
                     goRight(200);
                     rotateCCW(50);
@@ -128,14 +128,14 @@ public class AutoWARPBlocksBlueBridge extends LinearOpMode {
                     rotateCCW(40);
 
                     // Grabbing the black block and moving back toward fence.
-                    right_arm.setPosition(0.75);
+                    right_arm.setPosition(0.88);
                     sleep(1000);
                     goRight(800);
                     rotateCCW(30);
 
                     // Going under the skystone bridge and releasing block.
                     goBack(6100);
-                    right_arm.setPosition(0);
+                    right_arm.setPosition(.1);
                     sleep(500);
                     goRight(200);
 
@@ -147,30 +147,30 @@ public class AutoWARPBlocksBlueBridge extends LinearOpMode {
                 case 3:
                     // Going under the skystone bridge. Releasing block. Moving back toward fence a hair.
                     goBack(4500);
-                    right_arm.setPosition(0);
+                    right_arm.setPosition(.1);
                     sleep(500);
                     goRight(200);
                     rotateCCW(65);
 
                     // Going back to the blocks.
-                    goForward(6600);
+                    goForward(6400);
                     goLeft(1350);
 
                     // Grabbing the second black block and moving back toward fence.
-                    right_arm.setPosition(0.75);
+                    right_arm.setPosition(0.88);
                     sleep(1000);
                     goRight(1200);
                     rotateCCW(50);
 
                     // Going under the skystone bridge and releasing block.
                     goBack(7000);
-                    right_arm.setPosition(0);
+                    right_arm.setPosition(.1);
                     sleep(500);
                     goRight(200);
 
                     // Going to sky bridge tape.
-                    goForward(1200);
-                    goLeft(1000);
+                    goForward(1400);
+                    goLeft(800);
                     break;
             }
         }
