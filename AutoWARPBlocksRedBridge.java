@@ -68,8 +68,8 @@ public class AutoWARPBlocksRedBridge extends LinearOpMode {
 
             // Going to the blocks initially. Finding the first black block.
             int block_count = 0;  // will change to 1, 2, or 3
-            goLeft(2220);
-            while (block_count < 2) {  // condition to guarantee we don't get stuck here
+            goLeft(2280);
+            while (block_count < 2) {  // condition to guarantee we don't get stuck here if sensor fails
                 if (isYellow()) {
                     rotateCW(30);
                     goBack(710);
@@ -82,7 +82,7 @@ public class AutoWARPBlocksRedBridge extends LinearOpMode {
 
             // Grabbing the black block.
             left_arm.setPosition(0.68);
-            sleep(1000);
+            sleep(1500);
 
             // Moving back to wall
             goRight(800);
@@ -97,7 +97,7 @@ public class AutoWARPBlocksRedBridge extends LinearOpMode {
                     rotateCW(30);
 
                     // Going back to the blocks.
-                    goBack(5130);
+                    goBack(4800);
                     goLeft(1150);
 
                     // Grabbing the black block and

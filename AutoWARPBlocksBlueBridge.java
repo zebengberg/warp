@@ -63,10 +63,12 @@ public class AutoWARPBlocksBlueBridge extends LinearOpMode {
 
             // Going to the blocks initially. Finding the first black block.
             int block_count = 0;  // will change to 1, 2, or 3
-            goLeft(2220);
-            while (block_count < 3) {  // condition to guarantee we don't get stuck here
+            rotateCW(30);
+            goLeft(2360);
+            while (block_count < 2) {  // condition to guarantee we don't get stuck here if sensor fails
                 if (isYellow()) {
                     goForward(710);
+                    rotateCW(30);
                     block_count++;
                 } else {
                     block_count++;
@@ -76,57 +78,62 @@ public class AutoWARPBlocksBlueBridge extends LinearOpMode {
 
             // Grabbing the black block.
             right_arm.setPosition(0.75);
-            sleep(1000);
+            sleep(1500);
 
             // Moving back to wall
-            goRight(800);
+            goRight(1200);
 
             switch (block_count) {
                 case 1:
                     // Going under the skystone bridge. Releasing block. Moving back toward fence a hair.
-                    goBack(3000);
+                    goBack(3500);
                     right_arm.setPosition(0);
                     sleep(500);
                     goRight(200);
+                    rotateCCW(30);
 
                     // Going back to the blocks.
-                    goForward(5130);
-                    goLeft(1150);
+                    goForward(5200);
+                    goLeft(1180);
 
-                    // Grabbing the black block and moving back toward fence.
+                    // Grabbing the second black block and moving back toward fence.
                     right_arm.setPosition(0.75);
                     sleep(1000);
-                    goRight(800);
+                    goRight(900);
+                    rotateCCW(30);
 
                     // Going under the skystone bridge and releasing block.
-                    goBack(5130);
+                    goBack(5580);
                     right_arm.setPosition(0);
                     sleep(500);
                     goRight(200);
 
                     // Going to sky bridge tape.
-                    goForward(1100);
-                    goLeft(1000);
+                    goForward(1300);
+                    goLeft(1200);
                     break;
 
                 case 2:
                     // Going under the skystone bridge. Releasing block. Moving back toward fence a hair.
-                    goBack(3710);
+                    goBack(4210);
                     right_arm.setPosition(0);
                     sleep(500);
                     goRight(200);
+                    rotateCCW(50);
 
                     // Going back to the blocks.
-                    goForward(5840);
-                    goLeft(1150);
+                    goForward(6100);
+                    goLeft(1200);
+                    rotateCCW(40);
 
                     // Grabbing the black block and moving back toward fence.
                     right_arm.setPosition(0.75);
                     sleep(1000);
                     goRight(800);
+                    rotateCCW(30);
 
                     // Going under the skystone bridge and releasing block.
-                    goBack(5840);
+                    goBack(6100);
                     right_arm.setPosition(0);
                     sleep(500);
                     goRight(200);
@@ -138,28 +145,30 @@ public class AutoWARPBlocksBlueBridge extends LinearOpMode {
 
                 case 3:
                     // Going under the skystone bridge. Releasing block. Moving back toward fence a hair.
-                    goBack(4420);
+                    goBack(4500);
                     right_arm.setPosition(0);
                     sleep(500);
                     goRight(200);
+                    rotateCCW(65);
 
                     // Going back to the blocks.
-                    goForward(6550);
-                    goLeft(1150);
+                    goForward(6600);
+                    goLeft(1350);
 
-                    // Grabbing the black block and moving back toward fence.
+                    // Grabbing the second black block and moving back toward fence.
                     right_arm.setPosition(0.75);
                     sleep(1000);
-                    goRight(800);
+                    goRight(1200);
+                    rotateCCW(50);
 
                     // Going under the skystone bridge and releasing block.
-                    goBack(6550);
+                    goBack(7000);
                     right_arm.setPosition(0);
                     sleep(500);
                     goRight(200);
 
                     // Going to sky bridge tape.
-                    goForward(1100);
+                    goForward(1200);
                     goLeft(1000);
                     break;
             }
