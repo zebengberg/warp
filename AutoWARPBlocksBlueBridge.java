@@ -47,7 +47,6 @@ public class AutoWARPBlocksBlueBridge extends LinearOpMode {
         // Servos for little arms
         Servo right_arm = hardwareMap.servo.get("right_arm");
         right_arm.setDirection(Servo.Direction.REVERSE);
-        right_arm.setPosition(.1);
 
         // Sensors
         right_color = hardwareMap.get(ColorSensor.class, "right_color");
@@ -59,7 +58,6 @@ public class AutoWARPBlocksBlueBridge extends LinearOpMode {
 
 
         waitForStart();
-
 
         if (opModeIsActive()) {
 
@@ -79,6 +77,7 @@ public class AutoWARPBlocksBlueBridge extends LinearOpMode {
             // Grabbing the black block.
             right_arm.setPosition(0.75);
             sleep(1000);
+
             // Moving back to wall
             goRight(800);
 
@@ -182,6 +181,54 @@ public class AutoWARPBlocksBlueBridge extends LinearOpMode {
             }
         }
         return busyCount;
+    }
+
+    private void rotateCW(int position) {
+        front_right_wheel.setTargetPosition(position);
+        front_left_wheel.setTargetPosition(position);
+        back_left_wheel.setTargetPosition(position);
+        back_right_wheel.setTargetPosition(position);
+        for (DcMotor motor : motors) {
+            motor.setPower(.3);
+            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
+
+        while ((busyCounter() >= 2) && opModeIsActive()) {
+            telemetry.addData("target position", position);
+            for (DcMotor motor : motors) {
+                telemetry.addData(motor.getDeviceName(), motor.getCurrentPosition());
+            }
+            telemetry.update();
+        }
+
+        for (DcMotor motor : motors) {
+            motor.setPower(0);
+            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
+    }
+
+    private void rotateCCW(int position) {
+        front_right_wheel.setTargetPosition(-position);
+        front_left_wheel.setTargetPosition(-position);
+        back_left_wheel.setTargetPosition(-position);
+        back_right_wheel.setTargetPosition(-position);
+        for (DcMotor motor : motors) {
+            motor.setPower(.3);
+            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
+
+        while ((busyCounter() >= 2) && opModeIsActive()) {
+            telemetry.addData("target position", position);
+            for (DcMotor motor : motors) {
+                telemetry.addData(motor.getDeviceName(), motor.getCurrentPosition());
+            }
+            telemetry.update();
+        }
+
+        for (DcMotor motor : motors) {
+            motor.setPower(0);
+            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
     }
 
 
