@@ -66,19 +66,21 @@ public class AutoWARPBlocksRedBridge extends LinearOpMode {
 
         if (opModeIsActive()) {
 
-            // Going to the blocks initially. Finding the first black block.
-            int block_count = 0;  // will change to 1, 2, or 3
+            // Going to the blocks initially.
             goLeft(2280);
-            while (block_count < 2) {  // condition to guarantee we don't get stuck here if sensor fails
+
+            int block_count = 1;  // block_count will change to 1, 2, or 3
+            // Finding the first black block.
+            while (block_count < 3) {  // condition to guarantee we don't get stuck here if sensor fails
                 if (isYellow()) {
                     rotateCW(30);
                     goBack(710);
                     block_count++;
                 } else {
-                    block_count++;
                     break;
                 }
             }
+
 
             // Grabbing the black block.
             left_arm.setPosition(0.68);
@@ -100,7 +102,7 @@ public class AutoWARPBlocksRedBridge extends LinearOpMode {
                     goBack(4800);
                     goLeft(1150);
 
-                    // Grabbing the black block and
+                    // Grabbing the second black block and
                     rotateCCW(100);
                     left_arm.setPosition(0.68);
                     sleep(1000);
@@ -128,17 +130,17 @@ public class AutoWARPBlocksRedBridge extends LinearOpMode {
                     rotateCW(30);
 
                     // Going back to the blocks.
-                    goBack(5840);
+                    goBack(5540);
                     goLeft(1150);
 
-                    // Grabbing the black block and
+                    // Grabbing the second black block
                     rotateCCW(100);
                     left_arm.setPosition(0.68);
                     sleep(1000);
 
                     // Moving back toward fence
                     goRight(800);
-                    rotateCW(100);
+                    rotateCW(110);
 
                     // Going under the skystone bridge and releasing block.
                     goForward(5840);
@@ -153,33 +155,31 @@ public class AutoWARPBlocksRedBridge extends LinearOpMode {
 
                 case 3:
                     // Going under the skystone bridge. Releasing block.
-                    goForward(4420);
+                    goForward(4620);
                     left_arm.setPosition(0);
                     sleep(500);
                     rotateCW(30);
 
                     // Going back to the blocks.
-                    goBack(6550);
+                    goBack(6450);
                     goLeft(1150);
 
-                    // Grabbing the black block and
-                    rotateCCW(100);
+                    // Grabbing the second black block
                     left_arm.setPosition(0.68);
                     sleep(1000);
 
                     // Moving back toward fence
-                    goRight(800);
-                    rotateCW(100);
+                    goRight(1400);
 
                     // Going under the skystone bridge and releasing block.
                     goForward(6550);
                     left_arm.setPosition(0);
                     sleep(500);
-                    goRight(200);
+                    goRight(600);
 
                     // Going to sky bridge tape.
                     goBack(1100);
-                    goLeft(1000);
+                    goLeft(1300);
                     break;
             }
         }

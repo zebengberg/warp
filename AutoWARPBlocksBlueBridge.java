@@ -61,17 +61,18 @@ public class AutoWARPBlocksBlueBridge extends LinearOpMode {
 
         if (opModeIsActive()) {
 
-            // Going to the blocks initially. Finding the first black block.
-            int block_count = 0;  // will change to 1, 2, or 3
+            // Going to the blocks initially.
             rotateCW(30);
             goLeft(2360);
-            while (block_count < 2) {  // condition to guarantee we don't get stuck here if sensor fails
+
+            // Finding the first black block. Variable will change to 1, 2, or 3
+            int block_count = 1;
+            while (block_count < 3) {  // condition to guarantee we don't get stuck here if sensor fails
                 if (isYellow()) {
                     goForward(710);
                     rotateCW(30);
                     block_count++;
                 } else {
-                    block_count++;
                     break;
                 }
             }
