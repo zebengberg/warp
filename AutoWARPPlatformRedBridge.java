@@ -16,12 +16,6 @@ public class AutoWARPPlatformRedBridge extends LinearOpMode {
     private DcMotor front_right_wheel;
     private DcMotor[] motors;
 
-    private Servo left_platform;
-    private Servo right_platform;
-    private Servo capstone;
-
-
-
     @Override
     public void runOpMode() {
         // DC motors for holonomic drive.
@@ -43,15 +37,15 @@ public class AutoWARPPlatformRedBridge extends LinearOpMode {
         }
 
         // Servos for moving the platform.
-        left_platform = hardwareMap.servo.get("left_platform");
-        right_platform = hardwareMap.servo.get("right_platform");
+        Servo left_platform = hardwareMap.servo.get("left_platform");
+        Servo right_platform = hardwareMap.servo.get("right_platform");
         left_platform.setDirection(Servo.Direction.FORWARD);
         right_platform.setDirection(Servo.Direction.REVERSE);
         left_platform.setPosition(0);
         right_platform.setPosition(0);
 
         // Lower the capstone servo
-        capstone = hardwareMap.servo.get("capstone");
+        Servo capstone = hardwareMap.servo.get("capstone");
         capstone.setDirection(Servo.Direction.REVERSE);
         capstone.setPosition(0);
 
