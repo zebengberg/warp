@@ -68,20 +68,23 @@ public class AutoWARPPlatformBlueBridge extends LinearOpMode {
             // Dragging platform
             goBack(100);
             rotateCCW(425);
-            goLeft(2000);
+            goLeft(1000);
             rotateCCW(1025);
 
-            goForward(1915);
-            rotateCCW(500);
-            goRight(500);
+            goForward(1000);
+            goRight(1000);
+            rotateCCW(400);
+
+            // Releasing platform
             left_platform.setPosition(0);
             right_platform.setPosition(0);
             sleep(1000);
             rotateCW(100);
 
             // going under the bridge
+            goForward(1500);
             goLeft(3200);
-            goForward(400);
+            goForward(200);
 
         }
     }

@@ -55,7 +55,7 @@ public class AutoWARPPlatformRedBridge extends LinearOpMode {
         if (opModeIsActive()) {
 
             // Moving to platform.
-            goRight(2445);
+            goRight(2500);
             goBack(450);
 
 
@@ -65,20 +65,25 @@ public class AutoWARPPlatformRedBridge extends LinearOpMode {
 
             // Dragging platform
             goForward(100);
-            rotateCW(425);
-            goLeft(2000);
+            rotateCW(500);
+            goLeft(1500);
             rotateCW(1025);
 
-            goBack(1915);
-            rotateCW(400);
+            goBack(1000);
+            goLeft(100);
+            rotateCW(500);
+            goRight(700);
+
             left_platform.setPosition(0);
             right_platform.setPosition(0);
             sleep(1000);
             rotateCCW(100);
 
             // going under the bridge
-            goLeft(3200);
-            goBack(400);
+            goBack(1500);
+            rotateCW(100);
+            goLeft(3800);
+            goBack(300);
 
         }
     }
