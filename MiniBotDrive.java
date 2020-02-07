@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -19,14 +20,12 @@ public class MiniBotDrive extends LinearOpMode {
 
         DcMotor left_motor = hardwareMap.dcMotor.get("left_motor");
         DcMotor right_motor = hardwareMap.dcMotor.get("right_motor");
+        left_motor.setDirection(DcMotorSimple.Direction.REVERSE);
+        right_motor.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        // Creating an array of motors so we can iterate over it.
         DcMotor[] motors = {left_motor, right_motor};
-        // Initializing the motors.
         for (DcMotor motor : motors) {
-            // REV HD Hex encoder counts 2240 per rotation.
-            motor.setDirection(DcMotor.Direction.REVERSE);
-            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
 
@@ -40,12 +39,39 @@ public class MiniBotDrive extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            for (DcMotor motor : motors) {
-                telemetry.addData(motor.getDeviceName(), motor.getPower());
+            double y = -gamepad1.right_stick_y;
+            double x = gamepad1.right_stick_x;
+            double dist = Math.min(left_distance.getDistance(DistanceUnit.CM),
+                                   right_distance.getDistance(DistanceUnit.CM));
+
+            double multiplier = 1.0;
+            if (dist < 5) {
+                // TODO: allow robot to reverse out from front of wall
+                multiplier = 0;
+            } else if (dist < 20) {
+                multiplier = (dist - 5) / 15;
             }
-            for (DistanceSensor sensor : sensors) {
-                telemetry.addData(sensor.getDeviceName(), sensor.getDistance(DistanceUnit.CM));
+
+
+            double left_power = (y + x / 4) * multiplier;
+            double right_power = (y - x / 4) * multiplier;
+            double max_power =  Math.max(Math.abs(left_power), Math.abs(right_power));
+
+            // Scaling so that nothing gets accidentally clipped
+            if (max_power > 1) {
+                left_power /= max_power;
+                right_power /= max_power;
             }
+
+            left_motor.setPower(left_power);
+            right_motor.setPower(right_power);
+
+            
+            telemetry.addData("left motor", left_motor.getPower());
+            telemetry.addData("right motor", right_motor.getPower());
+            telemetry.addData("left distance", left_distance.getDistance(DistanceUnit.CM));
+            telemetry.addData("right distance", right_distance.getDistance(DistanceUnit.CM));
+            telemetry.addData("motor multiplier", multiplier);
             telemetry.update();
 
         }
