@@ -40,6 +40,9 @@ public class MiniBotDrive extends LinearOpMode {
         while (opModeIsActive()) {
 
             double y = -gamepad1.right_stick_y;
+            if (y < 0) {
+                y /= 2; // slowing it down when reversing
+            }
             double x = gamepad1.right_stick_x;
             double dist = Math.min(left_distance.getDistance(DistanceUnit.CM),
                                    right_distance.getDistance(DistanceUnit.CM));
@@ -66,7 +69,6 @@ public class MiniBotDrive extends LinearOpMode {
             left_motor.setPower(left_power);
             right_motor.setPower(right_power);
 
-            
             telemetry.addData("left motor", left_motor.getPower());
             telemetry.addData("right motor", right_motor.getPower());
             telemetry.addData("left distance", left_distance.getDistance(DistanceUnit.CM));
