@@ -21,7 +21,7 @@ public class MiniBotDrive extends LinearOpMode {
         DcMotor left_motor = hardwareMap.dcMotor.get("left_motor");
         DcMotor right_motor = hardwareMap.dcMotor.get("right_motor");
         left_motor.setDirection(DcMotorSimple.Direction.REVERSE);
-        right_motor.setDirection(DcMotorSimple.Direction.FORWARD);
+        right_motor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         DcMotor[] motors = {left_motor, right_motor};
         for (DcMotor motor : motors) {
@@ -48,16 +48,17 @@ public class MiniBotDrive extends LinearOpMode {
                                    right_distance.getDistance(DistanceUnit.CM));
 
             double multiplier = 1.0;
-            if (dist < 5) {
-                // TODO: allow robot to reverse out from front of wall
-                multiplier = 0;
-            } else if (dist < 20) {
-                multiplier = (dist - 5) / 15;
+            if (y > 0) {
+                if (dist < 10) {
+                    // TODO: allow robot to reverse out from front of wall
+                    multiplier = 0;
+                } else if (dist < 50) {
+                    multiplier = (dist - 10) / 40;
+                }
             }
-
-
-            double left_power = (y + x / 4) * multiplier;
-            double right_power = (y - x / 4) * multiplier;
+            
+            double left_power = (y + x / 2) * multiplier;
+            double right_power = (y - x / 2) * multiplier;
             double max_power =  Math.max(Math.abs(left_power), Math.abs(right_power));
 
             // Scaling so that nothing gets accidentally clipped
