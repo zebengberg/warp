@@ -56,7 +56,7 @@ public class MiniBotDrive extends LinearOpMode {
                     multiplier = (dist - 10) / 40;
                 }
             }
-            
+
             double left_power = (y + x / 2) * multiplier;
             double right_power = (y - x / 2) * multiplier;
             double max_power =  Math.max(Math.abs(left_power), Math.abs(right_power));
