@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 
@@ -26,6 +27,7 @@ public class TeleWARP extends LinearOpMode {
     private DcMotor front_right_wheel;
     private DcMotor[] motors;
     private double reset_angle;
+
     private double dc_power_state;
     private double rot_power_state;
 
@@ -40,11 +42,15 @@ public class TeleWARP extends LinearOpMode {
     private boolean platform_state;
     private double platform_time;
 
-    private DcMotor big_arm;
-    private double big_arm_power_state;
+    private DcMotor left_lift;
+    private DcMotor right_lift;
+    private int lift_target_position;
     private Servo wrist;
     private boolean wrist_state;
     private double wrist_time;
+
+
+
 
     private Servo capstone;
     private double[] capstone_states;
@@ -98,10 +104,15 @@ public class TeleWARP extends LinearOpMode {
         platform_time = 0.0;
 
         // Motors for big arm.
-        big_arm = hardwareMap.dcMotor.get("big_arm");
-        big_arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        big_arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        big_arm_power_state = 1.0;
+        left_lift = hardwareMap.dcMotor.get("left_lift");
+        right_lift = hardwareMap.dcMotor.get("right_lift");
+        left_lift.setDirection(DcMotor.Direction.FORWARD);
+        right_lift.setDirection(DcMotor.Direction.FORWARD);
+        left_lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        left_lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        right_lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        right_lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
 
         wrist = hardwareMap.servo.get("wrist");
         wrist_state = true;
@@ -149,11 +160,9 @@ public class TeleWARP extends LinearOpMode {
             if (gamepad1.right_trigger > 0) {
                 dc_power_state = 0.3;
                 rot_power_state = 0.2;
-                big_arm_power_state = 0.3;
             } else {
                 dc_power_state = 1.0;
                 rot_power_state = 0.4;
-                big_arm_power_state = 1.0;
             }
 
 
@@ -228,13 +237,16 @@ public class TeleWARP extends LinearOpMode {
             }
 
 
-            // Controlling the big arm.
-            if ((gamepad1.right_stick_y > 0.5) && (big_arm.getCurrentPosition() > -4500)) {
-                big_arm.setPower((-2 * gamepad1.right_stick_y + 1) * big_arm_power_state);
-            } else if ((gamepad1.right_stick_y < -0.5) && (big_arm.getCurrentPosition() < 0)) {
-                big_arm.setPower((-2 * gamepad1.right_stick_y - 1) * big_arm_power_state);
+            // Controlling the lift.
+            if (gamepad1.right_trigger > 0) {
+                left_lift.setPower(gamepad1.right_trigger);
+                right_lift.setPower(gamepad1.right_trigger);
+            } else if (gamepad1.left_trigger > 0) {
+                left_lift.setPower(-gamepad1.left_trigger);
+                right_lift.setPower(-gamepad1.left_trigger);
             } else {
-                  big_arm.setPower(0);
+                left_lift.setPower(0);
+                right_lift.setPower(0);
             }
 
             // Using a delay to set the wrist grabber.
@@ -244,38 +256,51 @@ public class TeleWARP extends LinearOpMode {
             }
 
             if (wrist_state) {
-                wrist.setPosition(0.6);
+                wrist.setPosition(1.0);
             } else {
                 wrist.setPosition(0);
             }
 
-            if (gamepad1.dpad_up && (capstone_time < time - 0.2)) {
-                if (capstone_state < capstone_states.length - 1) {
-                    capstone_state++;
-                    capstone_time = time;
-                }
-            } else if (gamepad1.dpad_down && (capstone_time < time - 0.2)) {
-                if (capstone_state > 0) {
-                    capstone_state--;
-                    capstone_time = time;
-                }
-            }
-            capstone.setPosition(capstone_states[capstone_state]);
 
 
-            telemetry.addData("Front Left ", front_left_wheel.getPower());
-            telemetry.addData("Front Right", front_right_wheel.getPower());
-            telemetry.addData("Back Left  ", back_left_wheel.getPower());
-            telemetry.addData("Back Right ", back_right_wheel.getPower());
-            telemetry.addData("Rotation Angle", gyro * 180 / Math.PI); // degrees
-            telemetry.addData("Left Arm ", left_arm.getPosition());
-            telemetry.addData("Right Arm", right_arm.getPosition());
-            telemetry.addData("Big Arm Power", big_arm.getPower());
-            telemetry.addData("Big Arm Encoder", big_arm.getCurrentPosition());
-            telemetry.addData("Wrist", wrist.getPosition());
-            telemetry.addData("Capstone", capstone.getPosition());
-            telemetry.update();
+//            if (gamepad1.dpad_up && (capstone_time < time - 0.2)) {
+//                if (capstone_state < capstone_states.length - 1) {
+//                    capstone_state++;
+//                    capstone_time = time;
+//                }
+//            } else if (gamepad1.dpad_down && (capstone_time < time - 0.2)) {
+//                if (capstone_state > 0) {
+//                    capstone_state--;
+//                    capstone_time = time;
+//                }
+//            }
+//            capstone.setPosition(capstone_states[capstone_state]);
+
+
+
         }
+    }
+
+    private void printStatus() {
+        telemetry.addData("Front Left ", front_left_wheel.getPower());
+        telemetry.addData("Front Right", front_right_wheel.getPower());
+        telemetry.addData("Back Left  ", back_left_wheel.getPower());
+        telemetry.addData("Back Right ", back_right_wheel.getPower());
+
+        telemetry.addData("Left Arm ", left_arm.getPosition());
+        telemetry.addData("Right Arm", right_arm.getPosition());
+
+        telemetry.addData("Left lift position", left_lift.getCurrentPosition());
+        telemetry.addData("Right lift position", right_lift.getCurrentPosition());
+
+        telemetry.addData("wrist position", wrist.getPosition());
+        telemetry.update();
+    }
+
+
+    // Returns the average of the two lift encoder positions.
+    private int getLiftPosition() {
+        return (left_lift.getCurrentPosition() + right_lift.getCurrentPosition()) / 2;
     }
 }
 
