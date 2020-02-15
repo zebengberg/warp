@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 
@@ -25,39 +24,33 @@ public class TeleWARP extends LinearOpMode {
     private DcMotor back_left_wheel;
     private DcMotor back_right_wheel;
     private DcMotor front_right_wheel;
-    private DcMotor[] motors;
-    private double reset_angle;
-
-    private double dc_power_state;
-    private double rot_power_state;
-
 
     private Servo left_arm;
     private Servo right_arm;
-    private boolean small_arms_down_state;
-    private double small_arms_down_time;
 
     private Servo left_platform;
     private Servo right_platform;
-    private boolean platform_state;
-    private double platform_time;
+    private boolean is_platform_pressed = false;
+    private boolean platform_state = false;
+
+    private Servo wrist;
+    private boolean is_wrist_pressed = false;
+    private boolean wrist_state = false;
 
     private DcMotor left_lift;
     private DcMotor right_lift;
-    private int lift_target_position;
-    private Servo wrist;
-    private boolean wrist_state;
-    private double wrist_time;
+    private boolean is_lift_pressed = false;
+    // The lift has four different states
+    // State 0: all the way down in starting position
+    // State 1: at the apex above the block to be stacked
+    // State 2: down on top of the next block
+    // State 3: back up at the apex after block has been released
+    private int lift_state = 0;
+    private int lift_block_number = 0;
+    private int[] lift_targets = {100, 500, 900, 1300, 1700, 2100};
 
 
 
-
-    private Servo capstone;
-    private double[] capstone_states;
-    private int capstone_state;
-    private double capstone_time;
-
-    private BNO055IMU imu;
 
 
     @Override
@@ -69,7 +62,7 @@ public class TeleWARP extends LinearOpMode {
         back_right_wheel = hardwareMap.dcMotor.get("back_right_wheel");
 
         // Creating an array of motors so we can iterate over it.
-        motors = new DcMotor[] {back_left_wheel, back_right_wheel, front_right_wheel, front_left_wheel};
+        DcMotor[] motors = {back_left_wheel, back_right_wheel, front_right_wheel, front_left_wheel};
 
         // Initializing the motors.
         for (DcMotor motor : motors) {
@@ -78,9 +71,9 @@ public class TeleWARP extends LinearOpMode {
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
-        reset_angle = 0;
-        dc_power_state = 1.0;
-        rot_power_state = 0.4;
+        double reset_angle = 0.0;
+        double dc_power_state;
+        double rot_power_state;
 
         // Servos for little arms
         left_arm = hardwareMap.servo.get("left_arm");
@@ -89,8 +82,7 @@ public class TeleWARP extends LinearOpMode {
         right_arm.setDirection(Servo.Direction.REVERSE);
         left_arm.setPosition(0.45);
         right_arm.setPosition(0.65);
-        small_arms_down_state = false;
-        small_arms_down_time = 0.0;
+
 
         // Servos for moving the platform.
         left_platform = hardwareMap.servo.get("left_platform");
@@ -99,9 +91,7 @@ public class TeleWARP extends LinearOpMode {
         right_platform.setDirection(Servo.Direction.REVERSE);
         left_platform.setPosition(0);
         right_platform.setPosition(0);
-        // Keep track of the whether the platform servos are up or down.
-        platform_state = false;
-        platform_time = 0.0;
+
 
         // Motors for big arm.
         left_lift = hardwareMap.dcMotor.get("left_lift");
@@ -115,23 +105,17 @@ public class TeleWARP extends LinearOpMode {
 
 
         wrist = hardwareMap.servo.get("wrist");
-        wrist_state = true;
-        wrist_time = 0.0;
 
-        // Motors for capstone arm.
-        capstone = hardwareMap.servo.get("capstone");
-        capstone.setDirection(Servo.Direction.REVERSE);
-        capstone.setPosition(0);
-        capstone_states = new double[] {0.0, 0.3, 0.35, 0.4, 0.425, 0.5};
-        capstone_state = 0;
-        capstone_time = 0.0;
+
+
+
 
         // IMU DEVICE
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.mode = BNO055IMU.SensorMode.IMU;
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         parameters.loggingEnabled = false;
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        BNO055IMU imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
 
@@ -150,14 +134,18 @@ public class TeleWARP extends LinearOpMode {
 
 
         // wait for start button
+        telemetry.speak("Push the start button bro!");
         waitForStart();
 
         while (opModeIsActive()) {
+            printStatus();
+
             // Controlling holonomic drive.
             double x = gamepad1.left_stick_x;
             double y = -gamepad1.left_stick_y;  // for some reason y-component opposite of Descartes
 
-            if (gamepad1.right_trigger > 0) {
+            // Slow mode
+            if (gamepad1.x) {
                 dc_power_state = 0.3;
                 rot_power_state = 0.2;
             } else {
@@ -189,55 +177,41 @@ public class TeleWARP extends LinearOpMode {
                 nw /= lambda;
             }
 
-
             front_left_wheel.setPower(ne + rotate);
             front_right_wheel.setPower(-nw + rotate);
             back_right_wheel.setPower(-ne + rotate);
             back_left_wheel.setPower(nw + rotate);
 
 
-            // Little arms
-            if (gamepad1.x && (small_arms_down_time < time - 0.5)) {
-                small_arms_down_state = !small_arms_down_state;
-                small_arms_down_time = time;
-            }
+
 
             if (gamepad1.left_bumper) {
                 left_arm.setPosition(0.69);
             } else {
-                if (small_arms_down_state) {
-                    left_arm.setPosition(0);
-                } else {
-                    left_arm.setPosition(0.45);
-                }
+                left_arm.setPosition(0.0);
             }
             if (gamepad1.right_bumper) {
-                right_arm.setPosition(0.88);
+                right_arm.setPosition(0.69);
             } else {
-                if (small_arms_down_state) {
-                    right_arm.setPosition(0);
-                } else {
-                    right_arm.setPosition(0.65);
-                }
+                right_arm.setPosition(0.0);
+            }
+
+            if (gamepad1.b && !is_platform_pressed) {
+                is_platform_pressed = true;
+                togglePlatformGrabbers();
+            } else if (!gamepad1.b) {
+                is_platform_pressed = false;
+            }
+
+            if (gamepad1.a && !is_wrist_pressed) {
+                is_wrist_pressed = true;
+                toggleWrist();
+            } else if (!gamepad1.a) {
+                is_wrist_pressed = false;
             }
 
 
-            // Set a delay so that the platform state cannot be changed more often than every 0.5s.
-            if (gamepad1.b && (platform_time < time - 0.5)) {
-                platform_state = !platform_state;
-                platform_time = time;
-            }
-
-            if (platform_state) {
-                left_platform.setPosition(0.4);
-                right_platform.setPosition(0.5);
-            } else {
-                left_platform.setPosition(0);
-                right_platform.setPosition(0);
-            }
-
-
-            // Controlling the lift.
+            // Controlling the lift manually.
             if (gamepad1.right_trigger > 0) {
                 left_lift.setPower(gamepad1.right_trigger);
                 right_lift.setPower(gamepad1.right_trigger);
@@ -249,35 +223,13 @@ public class TeleWARP extends LinearOpMode {
                 right_lift.setPower(0);
             }
 
-            // Using a delay to set the wrist grabber.
-            if (gamepad1.a && (wrist_time < time - 0.5)) {
-                wrist_state = !wrist_state;
-                wrist_time = time;
+            // Controlling the lift automatically.
+            if (gamepad1.dpad_up && !is_lift_pressed) {
+                is_lift_pressed = true;
+                automateLift();
+            }else if (!gamepad1.dpad_up) {
+                is_lift_pressed = false;
             }
-
-            if (wrist_state) {
-                wrist.setPosition(1.0);
-            } else {
-                wrist.setPosition(0);
-            }
-
-
-
-//            if (gamepad1.dpad_up && (capstone_time < time - 0.2)) {
-//                if (capstone_state < capstone_states.length - 1) {
-//                    capstone_state++;
-//                    capstone_time = time;
-//                }
-//            } else if (gamepad1.dpad_down && (capstone_time < time - 0.2)) {
-//                if (capstone_state > 0) {
-//                    capstone_state--;
-//                    capstone_time = time;
-//                }
-//            }
-//            capstone.setPosition(capstone_states[capstone_state]);
-
-
-
         }
     }
 
@@ -298,9 +250,53 @@ public class TeleWARP extends LinearOpMode {
     }
 
 
-    // Returns the average of the two lift encoder positions.
-    private int getLiftPosition() {
-        return (left_lift.getCurrentPosition() + right_lift.getCurrentPosition()) / 2;
+
+    private void automateLift() {
+        left_lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        right_lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        lift_state++;
+        lift_state %= 4;
+        int height = lift_targets[lift_block_number];
+        switch (lift_state) {
+            case 0:
+                left_lift.setTargetPosition(height);
+                right_lift.setTargetPosition(height);
+                break;
+            case 1:
+                left_lift.setTargetPosition(height - 50);
+                right_lift.setTargetPosition(height - 50);
+                break;
+            case 2:
+                left_lift.setTargetPosition(height);
+                right_lift.setTargetPosition(height);
+                break;
+            case 3:
+                left_lift.setTargetPosition(0);
+                right_lift.setTargetPosition(0);
+                lift_block_number++;
+                break;
+        }
+    }
+
+    private void togglePlatformGrabbers() {
+        platform_state = !platform_state;
+        if (platform_state) {
+            left_platform.setPosition(0.4);
+            right_platform.setPosition(0.5);
+        } else {
+            left_platform.setPosition(0);
+            right_platform.setPosition(0);
+        }
+    }
+
+    private void toggleWrist() {
+        wrist_state = !wrist_state;
+        if (wrist_state) {
+            wrist.setPosition(1.0);
+        } else {
+            wrist.setPosition(0);
+        }
     }
 }
 
