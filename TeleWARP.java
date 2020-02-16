@@ -25,6 +25,8 @@ public class TeleWARP extends LinearOpMode {
     private DcMotor back_right_wheel;
     private DcMotor front_right_wheel;
 
+    private boolean is_slow_mode_pressed = false;
+
     private Servo left_arm;
     private Servo right_arm;
 
@@ -39,15 +41,19 @@ public class TeleWARP extends LinearOpMode {
 
     private DcMotor left_lift;
     private DcMotor right_lift;
-    private boolean is_lift_pressed = false;
+
+
     // The lift has four different states
     // State 0: all the way down in starting position
     // State 1: at the apex above the block to be stacked
     // State 2: down on top of the next block
     // State 3: back up at the apex after block has been released
+    private boolean is_lift_pressed = false;
     private int lift_state = 0;
     private int lift_block_number = 0;
     private int[] lift_targets = {100, 500, 900, 1300, 1700, 2100};
+
+    private BNO055IMU imu;
 
 
 
@@ -80,17 +86,18 @@ public class TeleWARP extends LinearOpMode {
         right_arm = hardwareMap.servo.get("right_arm");
         left_arm.setDirection(Servo.Direction.FORWARD);
         right_arm.setDirection(Servo.Direction.REVERSE);
-        left_arm.setPosition(0.45);
-        right_arm.setPosition(0.65);
+        left_arm.setPosition(0.0);
+        right_arm.setPosition(0.0);
+
 
 
         // Servos for moving the platform.
         left_platform = hardwareMap.servo.get("left_platform");
         right_platform = hardwareMap.servo.get("right_platform");
-        left_platform.setDirection(Servo.Direction.FORWARD);
-        right_platform.setDirection(Servo.Direction.REVERSE);
-        left_platform.setPosition(0);
-        right_platform.setPosition(0);
+        left_platform.setDirection(Servo.Direction.REVERSE);
+        right_platform.setDirection(Servo.Direction.FORWARD);
+        left_platform.setPosition(0.0);
+        right_platform.setPosition(0.0);
 
 
         // Motors for big arm.
@@ -115,7 +122,7 @@ public class TeleWARP extends LinearOpMode {
         parameters.mode = BNO055IMU.SensorMode.IMU;
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         parameters.loggingEnabled = false;
-        BNO055IMU imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
 
@@ -124,7 +131,6 @@ public class TeleWARP extends LinearOpMode {
         telemetry.update();
         while (!isStopRequested() && !imu.isGyroCalibrated())
         {
-            sleep(50);
             idle();
         }
 
@@ -134,7 +140,7 @@ public class TeleWARP extends LinearOpMode {
 
 
         // wait for start button
-        telemetry.speak("Push the start button bro!");
+        telemetry.speak("jen jen jen jellybean");
         waitForStart();
 
         while (opModeIsActive()) {
@@ -142,15 +148,19 @@ public class TeleWARP extends LinearOpMode {
 
             // Controlling holonomic drive.
             double x = gamepad1.left_stick_x;
-            double y = -gamepad1.left_stick_y;  // for some reason y-component opposite of Descartes
+            double y = -gamepad1.left_stick_y;
 
             // Slow mode
-            if (gamepad1.x) {
+            if (gamepad1.x && !is_slow_mode_pressed) {
+                is_slow_mode_pressed = true;
                 dc_power_state = 0.3;
-                rot_power_state = 0.2;
+                rot_power_state = 0.3;
             } else {
                 dc_power_state = 1.0;
                 rot_power_state = 0.4;
+            }
+            if (!gamepad1.x) {
+                is_slow_mode_pressed = false;
             }
 
 
@@ -159,7 +169,9 @@ public class TeleWARP extends LinearOpMode {
 
             Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
             double gyro = angles.firstAngle;
-            if (gamepad1.y) { reset_angle = gyro; }
+            if (gamepad1.y) {
+                reset_angle = gyro;
+            }
             double angle = theta - gyro + reset_angle;  // for some reason gyro is opposite of math
 
             double rotate = gamepad1.right_stick_x * rot_power_state;  // rescale to slow it down.
@@ -186,12 +198,12 @@ public class TeleWARP extends LinearOpMode {
 
 
             if (gamepad1.left_bumper) {
-                left_arm.setPosition(0.69);
+                left_arm.setPosition(0.85);
             } else {
                 left_arm.setPosition(0.0);
             }
             if (gamepad1.right_bumper) {
-                right_arm.setPosition(0.69);
+                right_arm.setPosition(0.75);
             } else {
                 right_arm.setPosition(0.0);
             }
@@ -239,6 +251,10 @@ public class TeleWARP extends LinearOpMode {
         telemetry.addData("Back Left  ", back_left_wheel.getPower());
         telemetry.addData("Back Right ", back_right_wheel.getPower());
 
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
+        double gyro = angles.firstAngle;
+        telemetry.addData("gyro angle", gyro);
+
         telemetry.addData("Left Arm ", left_arm.getPosition());
         telemetry.addData("Right Arm", right_arm.getPosition());
 
@@ -246,6 +262,12 @@ public class TeleWARP extends LinearOpMode {
         telemetry.addData("Right lift position", right_lift.getCurrentPosition());
 
         telemetry.addData("wrist position", wrist.getPosition());
+
+        telemetry.addData("left platform", left_platform.getPosition());
+        telemetry.addData("right platform", right_platform.getPosition());
+
+        telemetry.addData("lift block number", lift_block_number);
+
         telemetry.update();
     }
 
@@ -254,6 +276,7 @@ public class TeleWARP extends LinearOpMode {
     private void automateLift() {
         left_lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         right_lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
 
         lift_state++;
         lift_state %= 4;
@@ -277,13 +300,17 @@ public class TeleWARP extends LinearOpMode {
                 lift_block_number++;
                 break;
         }
+
+        while (left_lift.isBusy() && right_lift.isBusy()) {
+            idle();
+        }
     }
 
     private void togglePlatformGrabbers() {
         platform_state = !platform_state;
         if (platform_state) {
-            left_platform.setPosition(0.4);
-            right_platform.setPosition(0.5);
+            left_platform.setPosition(0.3);
+            right_platform.setPosition(0.3);
         } else {
             left_platform.setPosition(0);
             right_platform.setPosition(0);
