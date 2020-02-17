@@ -24,7 +24,7 @@ public class Jens extends LinearOpMode {
     private Servo right_platform;
     private Servo wrist;
     private DcMotor[] motors;
-    BNO055IMU imu;
+    private BNO055IMU imu;
 
 
 
@@ -36,15 +36,15 @@ public class Jens extends LinearOpMode {
         back_right_wheel = hardwareMap.dcMotor.get("back_right_wheel");
 
         // Creating an array of motors so we can iterate over it.
-        motors = new DcMotor[]{back_left_wheel, back_right_wheel, front_right_wheel, front_left_wheel, left_lift, right_lift};
+        DcMotor[] motors = {back_left_wheel, back_right_wheel, front_right_wheel, front_left_wheel};
 
         // Initializing the motors.
         for (DcMotor motor : motors) {
             // REV HD Hex encoder counts 2240 per rotation.
             motor.setDirection(DcMotor.Direction.REVERSE);
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
 
         // Servos for moving the platform.
@@ -62,7 +62,7 @@ public class Jens extends LinearOpMode {
         parameters.mode = BNO055IMU.SensorMode.IMU;
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         parameters.loggingEnabled = false;
-        BNO055IMU imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
 
@@ -84,15 +84,15 @@ public class Jens extends LinearOpMode {
         // wait for start button
         waitForStart();
 
-        if (opModeIsActive()) {
-
+        while (opModeIsActive()) {
+            printDebug();
 
 
         }
-
-
     }
-    private void rotateCW ( int position){
+
+
+    private void rotateCW (int position){
         front_right_wheel.setTargetPosition(position);
         front_left_wheel.setTargetPosition(position);
         back_left_wheel.setTargetPosition(position);
@@ -285,7 +285,7 @@ public class Jens extends LinearOpMode {
     private void goStraightForward(int position) {
         // Using front left wheel as a proxy for forward position
 
-        while(front_left_wheel.getCurrentPosition() < position) {
+        while(front_left_wheel.getCurrentPosition() < position && opModeIsActive()) {
             Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
             double gyro = angles.firstAngle;
 
@@ -306,7 +306,6 @@ public class Jens extends LinearOpMode {
                 back_right_wheel.setPower(-1);
             }
         }
-
         for (DcMotor motor : motors) {
             motor.setPower(0);
         }
@@ -342,4 +341,12 @@ public class Jens extends LinearOpMode {
         }
     }
 
+    private void printDebug() {
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
+        double gyro = angles.firstAngle;
+        telemetry.addData("gyro", gyro);
+        telemetry.addData("forward-reverse encoder", front_left_wheel.getCurrentPosition());
+        telemetry.addData("side-side encoder", back_left_wheel.getCurrentPosition());
+        telemetry.update();
+    }
 }
