@@ -25,7 +25,11 @@ public class TeleWARP extends LinearOpMode {
     private DcMotor back_right_wheel;
     private DcMotor front_right_wheel;
 
-    private boolean is_slow_mode_pressed = false;
+    private boolean is_slow_pressed = false;
+    private boolean slow_state = false;
+    private double dc_power_state = 1.0;
+    private double rot_power_state = 0.6;
+    private double target_angle = 0.0;
 
     private Servo left_arm;
     private Servo right_arm;
@@ -78,8 +82,6 @@ public class TeleWARP extends LinearOpMode {
             motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
         double reset_angle = 0.0;
-        double dc_power_state;
-        double rot_power_state;
 
         // Servos for little arms
         left_arm = hardwareMap.servo.get("left_arm");
@@ -112,6 +114,8 @@ public class TeleWARP extends LinearOpMode {
 
 
         wrist = hardwareMap.servo.get("wrist");
+        wrist.setDirection(Servo.Direction.FORWARD);
+        wrist.setPosition(0.0);
 
 
 
@@ -129,10 +133,7 @@ public class TeleWARP extends LinearOpMode {
         // Make sure the imu gyro is calibrated before continuing.
         telemetry.addData("Status", "calibrating gyro");
         telemetry.update();
-        while (!isStopRequested() && !imu.isGyroCalibrated())
-        {
-            idle();
-        }
+        while (!isStarted() && !imu.isGyroCalibrated()) { idle(); }
 
         telemetry.addData("Status", imu.getCalibrationStatus().toString());
         telemetry.addData("Status", "Initialized");
@@ -144,50 +145,43 @@ public class TeleWARP extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            printStatus();
-
-            // Controlling holonomic drive.
-            double x = gamepad1.left_stick_x;
-            double y = -gamepad1.left_stick_y;
-
-            // Slow mode
-            if (gamepad1.x && !is_slow_mode_pressed) {
-                is_slow_mode_pressed = true;
-                dc_power_state = 0.3;
-                rot_power_state = 0.3;
-            } else {
-                dc_power_state = 1.0;
-                rot_power_state = 0.4;
-            }
-            if (!gamepad1.x) {
-                is_slow_mode_pressed = false;
-            }
+            //printStatus();
 
 
-            double theta = Math.atan2(y, x);
-            double r = Math.sqrt(x*x + y*y);
-
+            //TODO: deal with rotation by more than 180.
+            // Dealing with rotation stuff; all rotation controlled by right_stick.
+            target_angle += 0.1 * gamepad1.right_stick_x * rot_power_state;
             Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
             double gyro = angles.firstAngle;
             if (gamepad1.y) {
                 reset_angle = gyro;
             }
-            double angle = theta - gyro + reset_angle;  // for some reason gyro is opposite of math
+            double rotate = target_angle + gyro + reset_angle;
 
-            double rotate = gamepad1.right_stick_x * rot_power_state;  // rescale to slow it down.
+
+            // Dealing with velocity vector; all velocity controlled by left_stick.
+            double x = gamepad1.left_stick_x * dc_power_state;
+            double y = -gamepad1.left_stick_y * dc_power_state;
+            double theta = Math.atan2(y, x);
+            double r = Math.sqrt(x * x + y * y);
 
             // (cos, sin) = ne(1, 1) + nw(-1, 1)
             // Now dot with sides with (1, 1) and (-1, 1), then rescale.
-            double ne = Math.cos(angle) + Math.sin(angle);  // component in NE direction
-            double nw = -Math.cos(angle) + Math.sin(angle);  // component in NW direction
-            ne *= r * dc_power_state;  //scale
-            nw *= r * dc_power_state;
+            double ne = r * (Math.cos(theta) + Math.sin(theta));  // component in NE direction
+            double nw = r * (-Math.cos(theta) + Math.sin(theta));  // component in NW direction
+
             // may still need to scale to adjust for rotate
             double lambda = Math.max(Math.abs(ne), Math.abs(nw)) + Math.abs(rotate);
             if (lambda > 1) {
                 ne /= lambda;
                 nw /= lambda;
             }
+
+            telemetry.addData("theta", theta);
+            telemetry.addData("ne", ne);
+            telemetry.addData("nw", nw);
+            telemetry.addData("rotate", rotate);
+            telemetry.update();
 
             front_left_wheel.setPower(ne + rotate);
             front_right_wheel.setPower(-nw + rotate);
@@ -196,7 +190,7 @@ public class TeleWARP extends LinearOpMode {
 
 
 
-
+            // Small arms
             if (gamepad1.left_bumper) {
                 left_arm.setPosition(0.85);
             } else {
@@ -208,6 +202,7 @@ public class TeleWARP extends LinearOpMode {
                 right_arm.setPosition(0.0);
             }
 
+            // Toggle platform
             if (gamepad1.b && !is_platform_pressed) {
                 is_platform_pressed = true;
                 togglePlatformGrabbers();
@@ -215,6 +210,7 @@ public class TeleWARP extends LinearOpMode {
                 is_platform_pressed = false;
             }
 
+            // Toggle wrist
             if (gamepad1.a && !is_wrist_pressed) {
                 is_wrist_pressed = true;
                 toggleWrist();
@@ -222,6 +218,13 @@ public class TeleWARP extends LinearOpMode {
                 is_wrist_pressed = false;
             }
 
+            // Toggle slow
+            if (gamepad1.x && !is_slow_pressed) {
+                is_slow_pressed = true;
+                toggleSlow();
+            } else if (!gamepad1.x) {
+                is_slow_pressed = false;
+            }
 
             // Controlling the lift manually.
             if (gamepad1.right_trigger > 0) {
@@ -245,6 +248,7 @@ public class TeleWARP extends LinearOpMode {
         }
     }
 
+
     private void printStatus() {
         telemetry.addData("Front Left ", front_left_wheel.getPower());
         telemetry.addData("Front Right", front_right_wheel.getPower());
@@ -254,6 +258,7 @@ public class TeleWARP extends LinearOpMode {
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
         double gyro = angles.firstAngle;
         telemetry.addData("gyro angle", gyro);
+        telemetry.addData("target angle", target_angle);
 
         telemetry.addData("Left Arm ", left_arm.getPosition());
         telemetry.addData("Right Arm", right_arm.getPosition());
@@ -323,6 +328,17 @@ public class TeleWARP extends LinearOpMode {
             wrist.setPosition(1.0);
         } else {
             wrist.setPosition(0);
+        }
+    }
+
+    private void toggleSlow() {
+        slow_state = !slow_state;
+        if (slow_state) {
+            dc_power_state = 0.3;
+            rot_power_state = 0.3;
+        } else {
+            dc_power_state = 1.0;
+            rot_power_state = 0.6;
         }
     }
 }
