@@ -88,349 +88,89 @@ public class Jens extends LinearOpMode {
         telemetry.update();
 
 
-        telemetry.speak("jens jens jellybeans");
+        telemetry.speak("jens jens jens jens jellybeans jellybeans jellybeans");
 
         // wait for start button
         waitForStart();
 
         while (opModeIsActive()) {
-            goForward(50000);
-            goBack(0);
-            sleep(5000);
-            goForward(50000);
-            goBack(0);
-            sleep(5000);
-            goForward(50000);
-            goBack(0);
-            sleep(5000);
-            goForward(50000);
-            goBack(0);
-            sleep(5000);
-
-
+            jens_da_man();
         }
     }
 
 
-//    private void rotateCW (int position){
-//        front_right_wheel.setTargetPosition(position);
-//        front_left_wheel.setTargetPosition(position);
-//        back_left_wheel.setTargetPosition(position);
-//        back_right_wheel.setTargetPosition(position);
-//        for (DcMotor motor : motors) {
-//            motor.setPower(.3);
-//            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        }
-//
-//        while ((busyCounter() >= 2) && opModeIsActive()) {
-//            telemetry.addData("target position", position);
-//            for (DcMotor motor : motors) {
-//                telemetry.addData(motor.getDeviceName(), motor.getCurrentPosition());
-//            }
-//            telemetry.update();
-//        }
-//
-//        for (DcMotor motor : motors) {
-//            motor.setPower(0);
-//            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        }
-//    }
-//
-//    private void rotateCCW ( int position){
-//        front_right_wheel.setTargetPosition(-position);
-//        front_left_wheel.setTargetPosition(-position);
-//        back_left_wheel.setTargetPosition(-position);
-//        back_right_wheel.setTargetPosition(-position);
-//        for (DcMotor motor : motors) {
-//            motor.setPower(.3);
-//            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        }
-//
-//        while ((busyCounter() >= 2) && opModeIsActive()) {
-//            telemetry.addData("target position", position);
-//            for (DcMotor motor : motors) {
-//                telemetry.addData(motor.getDeviceName(), motor.getCurrentPosition());
-//            }
-//            telemetry.update();
-//        }
-//
-//        for (DcMotor motor : motors) {
-//            motor.setPower(0);
-//            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        }
-//    }
-//
-//
-//    private void goForward ( int position){
-//        front_right_wheel.setTargetPosition(-position);
-//        front_left_wheel.setTargetPosition(position);
-//        back_left_wheel.setTargetPosition(position);
-//        back_right_wheel.setTargetPosition(-position);
-//        for (DcMotor motor : motors) {
-//            motor.setPower(.3);
-//            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        }
-//
-//        while ((busyCounter() >= 2) && opModeIsActive()) {
-//            telemetry.addData("target position", position);
-//            for (DcMotor motor : motors) {
-//                telemetry.addData(motor.getDeviceName(), motor.getCurrentPosition());
-//            }
-//            telemetry.update();
-//        }
-//
-//        for (DcMotor motor : motors) {
-//            motor.setPower(0);
-//            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        }
-//    }
-//
-//    private void goRight ( int position){
-//        front_right_wheel.setTargetPosition(position);
-//        front_left_wheel.setTargetPosition(position);
-//        back_left_wheel.setTargetPosition(-position);
-//        back_right_wheel.setTargetPosition(-position);
-//        for (DcMotor motor : motors) {
-//            motor.setPower(.3);
-//            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        }
-//
-//        while ((busyCounter() >= 2) && opModeIsActive()) {
-//            telemetry.addData("target position", position);
-//            for (DcMotor motor : motors) {
-//                telemetry.addData(motor.getDeviceName(), motor.getCurrentPosition());
-//            }
-//            telemetry.update();
-//        }
-//
-//        for (DcMotor motor : motors) {
-//            motor.setPower(0);
-//            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        }
-//    }
-//
-//    private void goLeft ( int position){
-//        front_right_wheel.setTargetPosition(-position);
-//        front_left_wheel.setTargetPosition(-position);
-//        back_left_wheel.setTargetPosition(position);
-//        back_right_wheel.setTargetPosition(position);
-//        for (DcMotor motor : motors) {
-//            motor.setPower(.3);
-//            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        }
-//
-//        while ((busyCounter() >= 2) && opModeIsActive()) {
-//            telemetry.addData("target position", position);
-//            for (DcMotor motor : motors) {
-//                telemetry.addData(motor.getDeviceName(), motor.getCurrentPosition());
-//            }
-//            telemetry.update();
-//        }
-//
-//        for (DcMotor motor : motors) {
-//            motor.setPower(0);
-//            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        }
-//    }
-//
-//    private void goBack ( int position){
-//        front_right_wheel.setTargetPosition(position);
-//        front_left_wheel.setTargetPosition(-position);
-//        back_left_wheel.setTargetPosition(-position);
-//        back_right_wheel.setTargetPosition(position);
-//
-//        for (DcMotor motor : motors) {
-//            motor.setPower(.3);
-//            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        }
-//
-//        while ((busyCounter() >= 2) && opModeIsActive()) {
-//            telemetry.addData("target position", position);
-//            for (DcMotor motor : motors) {
-//                telemetry.addData(motor.getDeviceName(), motor.getCurrentPosition());
-//            }
-//            telemetry.update();
-//        }
-//
-//        for (DcMotor motor : motors) {
-//            motor.setPower(0);
-//            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        }
-//    }
-//
-//    private int busyCounter() {
-//        int busyCount = 0;
-//        for (DcMotor motor : motors) {
-//            if (motor.isBusy()) {
-//                busyCount++;
-//            }
-//        }
-//        return busyCount;
-//    }
 
     private void jens_da_man() {
-        goForward(2600);
+
+
         wrist.setPosition(0.5);
         sleep(500);
-        goBack(400);
-        goRight(2000);
+
         left_lift.setTargetPosition(100);
         right_lift.setTargetPosition(100);
-        goForward(400);
+
         wrist.setPosition(0.0);
         left_lift.setTargetPosition(0);
         right_lift.setTargetPosition(0);
         sleep(500);
-        goBack(400);
-        goLeft(4500);
-        goForward(400);
+
         wrist.setPosition(0.5);
         sleep(500);
-        goBack(400);
-        goRight(4500);
+
         left_lift.setTargetPosition(100);
         right_lift.setTargetPosition(100);
-        goForward(400);
+
         wrist.setPosition(0.0);
         left_lift.setTargetPosition(0);
         right_lift.setTargetPosition(0);
         left_platform.setPosition(0.5);
         right_platform.setPosition(0.5);
-        goBack(2400);
-        goLeft(1500);
-        goForward(400);
-        goRight(600);
-        goBack(400);
-        goLeft(2000);
+
     }
 
 
 
-    private void goForward(int position) {
+    private void moveTo(int x, int y) {
         // Using front left wheel as a proxy for forward-reverse position
-
-        while((-front_left_wheel.getCurrentPosition() < position) && opModeIsActive()) {
-            Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
-            double gyro = angles.firstAngle;
-
-            if (gyro < -0.03) {  // drifting CW; adjust by emphasizing CCW rotation
-                front_right_wheel.setPower(-1.0);
-                front_left_wheel.setPower(0.9);
-                back_left_wheel.setPower(0.9);
-                back_right_wheel.setPower(-1.0);
-            } else if (gyro > 0.03) {  // opposite of above
-                front_right_wheel.setPower(-0.9);
-                front_left_wheel.setPower(1.0);
-                back_left_wheel.setPower(1.0);
-                back_right_wheel.setPower(-0.9);
-            } else {
-                front_right_wheel.setPower(-1);
-                front_left_wheel.setPower(1);
-                back_left_wheel.setPower(1);
-                back_right_wheel.setPower(-1);
-            }
-
-            printDebug();
-        }
-        for (DcMotor motor : motors) {
-            motor.setPower(0);
-        }
-    }
-
-    private void goBack(int position) {
-        // Using front left wheel as a proxy for forward-reverse position
-
-        while((front_left_wheel.getCurrentPosition() < position) && opModeIsActive()) {
-            Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
-            double gyro = angles.firstAngle;
-
-            if (gyro < -0.01) {  // drifting CW; adjust by emphasizing CCW rotation
-                front_right_wheel.setPower(1.0);
-                front_left_wheel.setPower(-0.9);
-                back_left_wheel.setPower(-0.9);
-                back_right_wheel.setPower(1.0);
-            } else if (gyro > 0.01) {  // opposite of above
-                front_right_wheel.setPower(0.9);
-                front_left_wheel.setPower(-1.0);
-                back_left_wheel.setPower(-1.0);
-                back_right_wheel.setPower(0.9);
-            } else {
-                front_right_wheel.setPower(1.0);
-                front_left_wheel.setPower(-1.0);
-                back_left_wheel.setPower(-1.0);
-                back_right_wheel.setPower(-1.0);
-            }
-
-            printDebug();
-        }
-        for (DcMotor motor : motors) {
-            motor.setPower(0);
-        }
-    }
-
-    private void goRight(int position) {
         // Using front right wheel as a proxy for side-side position
+        double delta_x = x - front_right_wheel.getCurrentPosition();
+        double delta_y = y + front_left_wheel.getCurrentPosition();  // encoder associated to front_left_wheel backwards
+        double theta = Math.atan2(delta_y, delta_x);
 
-        while((front_right_wheel.getCurrentPosition() < position) && opModeIsActive()) {
+        // (cos, sin) = ne(1, 1) + nw(-1, 1)
+        // Now dot with sides with (1, 1) and (-1, 1), then rescale.
+        double ne = Math.cos(theta) + Math.sin(theta);  // component in NE direction
+        double nw = -Math.cos(theta) + Math.sin(theta);  // component in NW direction
+
+
+        while (Math.signum(delta_x) == Math.signum(x - front_right_wheel.getCurrentPosition()) ||
+                (Math.signum(delta_y) == Math.signum(y + front_left_wheel.getCurrentPosition()))) {
+
             Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
-            double gyro = angles.firstAngle;
+            double current_gyro = angles.firstAngle;
 
-            if (gyro < -0.01) {  // drifting CW; adjust by emphasizing CCW rotation
-                front_right_wheel.setPower(0.9);
-                front_left_wheel.setPower(0.9);
-                back_left_wheel.setPower(-1.0);
-                back_right_wheel.setPower(-1.0);
-            } else if (gyro > 0.01) {  // opposite of above
-                front_right_wheel.setPower(1.0);
-                front_left_wheel.setPower(1.0);
-                back_left_wheel.setPower(-0.9);
-                back_right_wheel.setPower(-0.9);
-            } else {
-                front_right_wheel.setPower(1.0);
-                front_left_wheel.setPower(1.0);
-                back_left_wheel.setPower(-1.0);
-                back_right_wheel.setPower(-1.0);
+            double lambda = Math.max(Math.abs(ne), Math.abs(nw)) + Math.abs(current_gyro);
+            if (lambda > 1) {
+                ne /= lambda;
+                nw /= lambda;
             }
 
-            printDebug();
+            front_left_wheel.setPower(ne + current_gyro);
+            front_right_wheel.setPower(-nw + current_gyro);
+            back_right_wheel.setPower(-ne + current_gyro);
+            back_left_wheel.setPower(nw + current_gyro);
+
+            telemetry.addData("theta", theta);
+            telemetry.addData("delta_x", delta_x);
+            telemetry.addData("delta_y", delta_y);
+            telemetry.addData("current gyro", current_gyro);
+            telemetry.update();
         }
+
         for (DcMotor motor : motors) {
             motor.setPower(0);
         }
     }
-
-    private void goLeft(int position) {
-        // Using front right wheel as a proxy for side-side position
-
-        while((front_right_wheel.getCurrentPosition() < position) && opModeIsActive()) {
-            Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
-            double gyro = angles.firstAngle;
-
-            if (gyro < -0.01) {  // drifting CW; adjust by emphasizing CCW rotation
-                front_right_wheel.setPower(-0.9);
-                front_left_wheel.setPower(-0.9);
-                back_left_wheel.setPower(1.0);
-                back_right_wheel.setPower(1.0);
-            } else if (gyro > 0.01) {  // opposite of above
-                front_right_wheel.setPower(-1.0);
-                front_left_wheel.setPower(-1.0);
-                back_left_wheel.setPower(0.9);
-                back_right_wheel.setPower(0.9);
-            } else {
-                front_right_wheel.setPower(-1.0);
-                front_left_wheel.setPower(-1.0);
-                back_left_wheel.setPower(1.0);
-                back_right_wheel.setPower(1.0);
-            }
-
-            printDebug();
-        }
-        for (DcMotor motor : motors) {
-            motor.setPower(0);
-        }
-    }
-
-
 
 
     private void printDebug() {
