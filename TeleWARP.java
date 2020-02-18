@@ -27,10 +27,9 @@ public class TeleWARP extends LinearOpMode {
 
     private boolean is_slow_pressed = false;
     private boolean slow_state = false;
-    private double dc_power_state = 1.0;
-    private double rot_power_state = 1.0;
+    private double max_lin_power = 1.0;
+    private double max_rot_power = 0.5;
 
-    private double target_angle = 0.0;
     private double current_gyro = 0.0;
     private double previous_gyro = 0.0;
     private double reset_angle = 0.0;
@@ -83,8 +82,15 @@ public class TeleWARP extends LinearOpMode {
             // REV HD Hex encoder counts 2240 per rotation.
             motor.setDirection(DcMotor.Direction.REVERSE);
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
+
+        // Initialing encoders.
+        // Forward-reverse encoder.
+        front_left_wheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        front_left_wheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        // Side-side encoder
+        front_right_wheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        front_right_wheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
         // Servos for little arms
@@ -153,26 +159,29 @@ public class TeleWARP extends LinearOpMode {
 
             // Dealing with rotation stuff; all rotation controlled by right_stick.
             previous_gyro = current_gyro;
-            target_angle += 0.1 * gamepad1.right_stick_x * rot_power_state;
             Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
             current_gyro = angles.firstAngle;
-            if (current_gyro - previous_gyro > Math.PI / 2) {
+            if (current_gyro - previous_gyro > Math.PI) {
                 current_gyro -= 2 * Math.PI;
-            } else if (current_gyro - previous_gyro < -Math.PI / 2) {
+            } else if (current_gyro - previous_gyro < -Math.PI) {
                 current_gyro += 2 * Math.PI;
             }
-
             if (gamepad1.y) {
-                target_angle = current_gyro;
-                current_gyro = 0.0;
-                previous_gyro = 0.0;
+                reset_angle = current_gyro;
             }
-            double rotate = target_angle + current_gyro;
 
+            double user_rot = gamepad1.right_stick_x;
+            double rotate;
+            if (Math.abs(user_rot) > 0.3) {
+                rotate = user_rot * max_rot_power;
+                reset_angle = current_gyro;
+            } else {
+                rotate = current_gyro - reset_angle;
+            }
 
             // Dealing with velocity vector; all velocity controlled by left_stick.
-            double x = gamepad1.left_stick_x * dc_power_state;
-            double y = -gamepad1.left_stick_y * dc_power_state;
+            double x = gamepad1.left_stick_x * max_lin_power;
+            double y = -gamepad1.left_stick_y * max_lin_power;
             double theta = Math.atan2(y, x) - current_gyro;  // delete current_gyro from this line to steer relative to the robot front
             double r = Math.sqrt(x * x + y * y);
 
@@ -261,8 +270,6 @@ public class TeleWARP extends LinearOpMode {
 
         telemetry.addData("current gyro", current_gyro);
         telemetry.addData("previous gyro", previous_gyro);
-        telemetry.addData("reset angle", reset_angle);
-        telemetry.addData("target angle", target_angle);
 
         telemetry.addData("Left Arm ", left_arm.getPosition());
         telemetry.addData("Right Arm", right_arm.getPosition());
@@ -338,11 +345,20 @@ public class TeleWARP extends LinearOpMode {
     private void toggleSlow() {
         slow_state = !slow_state;
         if (slow_state) {
-            dc_power_state = 0.3;
-            rot_power_state = 0.3;
+            max_lin_power = 0.4;
+            max_rot_power = 0.2;
         } else {
-            dc_power_state = 1.0;
-            rot_power_state = 1.0;
+            max_lin_power = 1.0;
+            max_rot_power = 0.5;
+        }
+    }
+
+    private double decelRotation(double rotation) {
+        double rotation_threshold = 0.3;
+        if (Math.abs(rotation) > rotation_threshold) {
+            return Math.signum(rotation) * max_rot_power;
+        } else {
+            return max_rot_power * rotation / rotation_threshold;
         }
     }
 }
