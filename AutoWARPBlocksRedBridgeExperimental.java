@@ -59,14 +59,15 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
 
 
         // Motors for big arm.
-        DcMotor left_lift = hardwareMap.dcMotor.get("left_lift");
-        DcMotor right_lift = hardwareMap.dcMotor.get("right_lift");
-        left_lift.setDirection(DcMotor.Direction.FORWARD);
-        right_lift.setDirection(DcMotor.Direction.FORWARD);
-        left_lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        right_lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        left_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        right_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        DcMotor left_lift = hardwareMap.dcMotor.get("left_lift");
+//        DcMotor right_lift = hardwareMap.dcMotor.get("right_lift");
+//        left_lift.setDirection(DcMotor.Direction.FORWARD);
+//        right_lift.setDirection(DcMotor.Direction.FORWARD);
+//        left_lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        right_lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        left_lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        right_lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
 
 
         // IMU DEVICE
@@ -99,48 +100,48 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
             moveTo(0, 13000);
             moveTo(55000, 13000);
 
-            left_lift.setTargetPosition(10);
-            right_lift.setTargetPosition(10);
-            while (left_lift.isBusy() && right_lift.isBusy()) {
-                left_lift.setPower(1.0);
-                right_lift.setPower(1.0);
-                telemetry.addData("left lift", left_lift.getCurrentPosition());
-                telemetry.addData("right lift", right_lift.getCurrentPosition());
-                telemetry.update();
-            }
+            //left_lift.setTargetPosition(10);
+            //right_lift.setTargetPosition(10);
+            //left_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            //right_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            while (left_lift.isBusy() && right_lift.isBusy()) {
+//                left_lift.setPower(1.0);
+//                right_lift.setPower(1.0);
+//                telemetry.addData("left lift", left_lift.getCurrentPosition());
+//                telemetry.addData("right lift", right_lift.getCurrentPosition());
+//                telemetry.update();
+//            }
 
 
 
 
 
-            sleep(2000);
-            moveTo(55000, 26000);
-            wrist.setPosition(0);
-            moveTo(52443, 13000);
-            left_lift.setTargetPosition(0);
-            right_lift.setTargetPosition(0);
-            moveTo(-18139, -12950);
-            moveTo(-18139, -23700);
-            wrist.setPosition(1.0);
-            moveTo(-18139, 12950);
-            moveTo(62200, -12950);
-            left_lift.setTargetPosition(25);
-            right_lift.setTargetPosition(25);
-            moveTo(62200, -23700 );
-            wrist.setPosition(0);
-            sleep(500);
-//            left_platform.setPosition(1.0);
-//            right_platform.setPosition(1.0);
-            sleep(500);
-            moveTo(62200, 0);
-//            left_platform.setPosition(0.0);
-//            right_platform.setPosition(0.0);
-            moveTo(0, 39200);
-            moveTo(39200, -13264);
-            moveTo(43427,-13264 );
-            moveTo(43200, -13264);
-            moveTo(43427, -22183);
-            moveTo(21800, -22183);
+//            sleep(2000);
+//            moveTo(55000, 26000);
+//            wrist.setPosition(0);
+//            moveTo(52443, 13000);
+//
+//            moveTo(-18139, -12950);
+//            moveTo(-18139, -23700);
+//            wrist.setPosition(1.0);
+//            moveTo(-18139, 12950);
+//            moveTo(62200, -12950);
+//
+//            moveTo(62200, -23700 );
+//            wrist.setPosition(0);
+//            sleep(500);
+////            left_platform.setPosition(1.0);
+////            right_platform.setPosition(1.0);
+//            sleep(500);
+//            moveTo(62200, 0);
+////            left_platform.setPosition(0.0);
+////            right_platform.setPosition(0.0);
+//            moveTo(0, 39200);
+//            moveTo(39200, -13264);
+//            moveTo(43427,-13264 );
+//            moveTo(43200, -13264);
+//            moveTo(43427, -22183);
+//            moveTo(21800, -22183);
         }
     }
 
@@ -150,53 +151,47 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
     private void moveTo(int x, int y) {
         // Using front left wheel as a proxy for forward-reverse position
         // Using front right wheel as a proxy for side-side position
-        double delta_x = x - front_right_wheel.getCurrentPosition();
-        double delta_y = y + front_left_wheel.getCurrentPosition();
-        double theta = Math.atan2(delta_y, delta_x);
 
-        // (cos, sin) = ne(1, 1) + nw(-1, 1)
-        // Now dot with sides with (1, 1) and (-1, 1), then rescale.
-        double ne = Math.cos(theta) + Math.sin(theta);  // component in NE direction
-        double nw = -Math.cos(theta) + Math.sin(theta);  // component in NW direction
-
-        int distance = Math.abs(x - front_right_wheel.getCurrentPosition()) + Math.abs(y + front_left_wheel.getCurrentPosition());
+        int sign_x = Integer.signum(x - get_x());
+        int sign_y = Integer.signum(y - get_y());
 
 
-        while (distance > 4000) {
-            distance = Math.abs(x - front_right_wheel.getCurrentPosition()) + Math.abs(y + front_left_wheel.getCurrentPosition());
+        do {
+            double delta_x = x - get_x();
+            double delta_y = y - get_y();
+            double theta = Math.atan2(delta_y, delta_x);
+            double dist = Math.floor(Math.sqrt(delta_x * delta_x + delta_y * delta_y));
 
+            // (cos, sin) = ne(1, 1) + nw(-1, 1)
+            // Now dot with sides with (1, 1) and (-1, 1), then rescale.
+            double ne = Math.cos(theta) + Math.sin(theta);  // component in NE direction
+            double nw = -Math.cos(theta) + Math.sin(theta);  // component in NW direction
             Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
             double gyro = angles.firstAngle;
-
-            double innerNE = 1.0;
-            double innerNW = 1.0;
-
             double lambda = Math.max(Math.abs(ne), Math.abs(nw)) + Math.abs(gyro);
-            if (lambda < 1) {
-                lambda = 1;
-            }
+            if (lambda < 1) { lambda = 1; }
+            ne = ne * decelLinear(dist) / lambda;
+            nw = nw * decelLinear(dist) / lambda;
 
-            innerNE = ne * decelLinear(distance) / lambda;
-            innerNW = nw * decelLinear(distance) / lambda;
-
-
-            front_left_wheel.setPower(innerNE + gyro);
-            front_right_wheel.setPower(-innerNW + gyro);
-            back_right_wheel.setPower(-innerNE + gyro);
-            back_left_wheel.setPower(innerNW + gyro);
+            front_left_wheel.setPower(ne + gyro);
+            front_right_wheel.setPower(-nw + gyro);
+            back_right_wheel.setPower(-ne + gyro);
+            back_left_wheel.setPower(nw + gyro);
 
             telemetry.addData("theta", theta);
             telemetry.addData("gyro", gyro);
             telemetry.addData("delta_x", delta_x);
             telemetry.addData("delta_y", delta_y);
-            telemetry.addData("distance", distance);
-            telemetry.addData("innerNE", innerNE);
-            telemetry.addData("innerNW", innerNW);
+            telemetry.addData("dist", dist);
+            telemetry.addData("ne", ne);
+            telemetry.addData("nw", nw);
             telemetry.update();
-        }
+        } while ((sign_x * (x - get_x()) > 1000) || (sign_y * (y - get_y()) > 1000));
+
         for (DcMotor motor : motors) {
             motor.setPower(0);
         }
+
     }
 
     private double decelLinear(double distance) {
@@ -247,9 +242,8 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
         telemetry.addData("side-side encoder", front_right_wheel.getCurrentPosition());
         telemetry.update();
     }
+
+    private int get_x() { return front_right_wheel.getCurrentPosition(); }
+
+    private int get_y() { return -front_left_wheel.getCurrentPosition(); }
 }
-
-//private void wrist(){}
-
-
-
