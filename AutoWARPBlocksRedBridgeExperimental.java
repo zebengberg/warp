@@ -83,48 +83,29 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            moveTo(23500, 0);
-            left_arm.setPosition(0.85);
-            sleep(1000);
-            moveTo(17000, 0);
             rotate(Math.PI / 2);
-            moveTo(45000, 0);
+            sleep(10000);
+
+            moveTo(0, -23500);
+            left_arm.setPosition(0.85);
+            wrist.setPosition(1.0);
+            sleep(3000);
+
+
+            moveTo(0, -16000);
+            rotate(Math.PI / 2);
+            moveTo(0, -45000);
+
+            moveTo(-13000, 0);
+
+
             left_arm.setPosition(0.0);
             sleep(1000);
-            moveTo(17000, 0);
+            moveTo(-17000, 0);
             rotate(Math.PI / 2);
         }
     }
 
-
-
-    private void jens_da_man() {
-
-
-        wrist.setPosition(0.5);
-        sleep(500);
-
-        left_lift.setTargetPosition(100);
-        right_lift.setTargetPosition(100);
-
-        wrist.setPosition(0.0);
-        left_lift.setTargetPosition(0);
-        right_lift.setTargetPosition(0);
-        sleep(500);
-
-        wrist.setPosition(0.5);
-        sleep(500);
-
-        left_lift.setTargetPosition(100);
-        right_lift.setTargetPosition(100);
-
-        wrist.setPosition(0.0);
-        left_lift.setTargetPosition(0);
-        right_lift.setTargetPosition(0);
-        left_platform.setPosition(0.5);
-        right_platform.setPosition(0.5);
-
-    }
 
 
 
@@ -140,28 +121,33 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
         double ne = Math.cos(theta) + Math.sin(theta);  // component in NE direction
         double nw = -Math.cos(theta) + Math.sin(theta);  // component in NW direction
 
+        int distance = Math.abs(x - front_right_wheel.getCurrentPosition()) + Math.abs(y + front_left_wheel.getCurrentPosition());
 
-        while (Math.signum(delta_x) == Math.signum(x - front_right_wheel.getCurrentPosition()) ||
-                (Math.signum(delta_y) == Math.signum(y + front_left_wheel.getCurrentPosition()))) {
+
+        while (distance > 5000) {
+            distance = Math.abs(x - front_right_wheel.getCurrentPosition()) + Math.abs(y + front_left_wheel.getCurrentPosition());
 
             Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
-            double current_gyro = angles.firstAngle;
+            double gyro = angles.firstAngle;
 
-            double lambda = Math.max(Math.abs(ne), Math.abs(nw)) + Math.abs(current_gyro);
+            double innerNE = 1.0;
+            double innerNW = 1.0;
+
+            double lambda = Math.max(Math.abs(ne), Math.abs(nw)) + Math.abs(gyro);
             if (lambda > 1) {
-                ne /= lambda;
-                nw /= lambda;
+                innerNE = ne * decelLinear(distance) / lambda;
+                innerNW = nw * decelLinear(distance) / lambda;
             }
 
-            front_left_wheel.setPower(ne + current_gyro);
-            front_right_wheel.setPower(-nw + current_gyro);
-            back_right_wheel.setPower(-ne + current_gyro);
-            back_left_wheel.setPower(nw + current_gyro);
+            front_left_wheel.setPower(innerNE + gyro);
+            front_right_wheel.setPower(-innerNW + gyro);
+            back_right_wheel.setPower(-innerNE + gyro);
+            back_left_wheel.setPower(innerNW + gyro);
 
             telemetry.addData("theta", theta);
             telemetry.addData("delta_x", delta_x);
             telemetry.addData("delta_y", delta_y);
-            telemetry.addData("current gyro", current_gyro);
+            telemetry.addData("gyro", gyro);
             telemetry.update();
         }
 
@@ -170,24 +156,42 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
         }
     }
 
-    private void rotate(double theta) {
-        if (theta > 0) {
-            Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
-            double gyro = angles.firstAngle;
-            while(Math.abs(theta - gyro) > .01) {
-                for (DcMotor motor : motors) {
-                    // TODO: use some decelerate function
-                    motor.setPower(decelAngle(theta - gyro));
-                }
-            }
+    private double decelLinear(double distance) {
+        if (distance > 10000) {
+            return 1.0;
+        } else {
+            return distance / 10000;
         }
     }
 
-    private double decelAngle(double theta) {
-        if (Math.abs(theta) > 0.3) {
-            return Math.signum(theta);
+    private void rotate(double theta) {
+        // TODO: theta < 0
+
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
+        double gyro = angles.firstAngle;
+        while(Math.abs(theta + gyro) > .1) {
+            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
+            gyro = angles.firstAngle;
+            for (DcMotor motor : motors) {
+                // TODO: use some decelerate function
+                motor.setPower(decelRotation(theta + gyro));
+            }
+            telemetry.addData("theta", theta);
+            telemetry.addData("gyro", gyro);
+            telemetry.update();
+        }
+        for (DcMotor motor : motors) {
+            motor.setPower(0);
+        }
+    }
+
+    private double decelRotation(double theta) {
+        if (Math.abs(theta) > 0.5) {
+            return .1;
+            //return Math.signum(theta);
         } else {
-            return theta / 0.3;
+            return .1;
+            //return theta / 0.5;
         }
     }
 
@@ -201,3 +205,5 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
         telemetry.update();
     }
 }
+
+
