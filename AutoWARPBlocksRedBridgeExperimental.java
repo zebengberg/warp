@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -21,7 +24,7 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
     private DcMotor[] motors;
     private BNO055IMU imu;
 
-
+    private double reset_gyro = 0.0;
 
     public void runOpMode() {
         // DC motors for holonomic drive.
@@ -88,24 +91,39 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
         telemetry.update();
 
 
-        telemetry.speak("jens jens jens jens jellybeans jellybeans jellybeans");
+        telemetry.speak("jens jens jens jens jellybeans");
 
         // wait for start button
         waitForStart();
 
         while (opModeIsActive()) {
-            moveTo(0, 26000);
-            wrist.setPosition(1.0);
+            moveTo(0, -24000);
+            left_arm.setPosition(0.85);
             sleep(1000);
-            moveTo(0, 13000);
-            moveTo(55000, 13000);
+            moveTo(0, -17000);
+            rotateTo(Math.PI / 2);
 
-            //left_lift.setTargetPosition(10);
-            //right_lift.setTargetPosition(10);
+
+            moveTo(0, -60000);
+            left_arm.setPosition(0.0);
+            sleep(1000);
+            moveTo(0, 0);
+            rotateTo(0);
+            moveTo(-2000, -6000);
+
+            left_arm.setPosition(0.85);
+            sleep(1000);
+            moveTo(0, 0);
+            rotateTo(Math.PI / 2);
+            moveTo(0, -60000);
+
+            rotateTo(100);
+
+
             //left_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             //right_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //            while (left_lift.isBusy() && right_lift.isBusy()) {
-//                left_lift.setPower(1.0);
+//               left_lift.setPower(1.0);
 //                right_lift.setPower(1.0);
 //                telemetry.addData("left lift", left_lift.getCurrentPosition());
 //                telemetry.addData("right lift", right_lift.getCurrentPosition());
@@ -168,25 +186,26 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
             double nw = -Math.cos(theta) + Math.sin(theta);  // component in NW direction
             Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
             double gyro = angles.firstAngle;
-            double lambda = Math.max(Math.abs(ne), Math.abs(nw)) + Math.abs(gyro);
+            double lambda = Math.max(Math.abs(ne), Math.abs(nw)) + Math.abs(gyro - reset_gyro);
             if (lambda < 1) { lambda = 1; }
             ne = ne * decelLinear(dist) / lambda;
             nw = nw * decelLinear(dist) / lambda;
 
-            front_left_wheel.setPower(ne + gyro);
-            front_right_wheel.setPower(-nw + gyro);
-            back_right_wheel.setPower(-ne + gyro);
-            back_left_wheel.setPower(nw + gyro);
+            front_left_wheel.setPower(ne + gyro - reset_gyro);
+            front_right_wheel.setPower(-nw + gyro - reset_gyro);
+            back_right_wheel.setPower(-ne + gyro - reset_gyro);
+            back_left_wheel.setPower(nw + gyro - reset_gyro);
 
             telemetry.addData("theta", theta);
             telemetry.addData("gyro", gyro);
+            telemetry.addData("reset gyro", reset_gyro);
             telemetry.addData("delta_x", delta_x);
             telemetry.addData("delta_y", delta_y);
             telemetry.addData("dist", dist);
             telemetry.addData("ne", ne);
             telemetry.addData("nw", nw);
             telemetry.update();
-        } while ((sign_x * (x - get_x()) > 1000) || (sign_y * (y - get_y()) > 1000));
+        } while ((sign_x * (x - get_x()) > 100) || (sign_y * (y - get_y()) > 100));
 
         for (DcMotor motor : motors) {
             motor.setPower(0);
@@ -196,13 +215,13 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
 
     private double decelLinear(double distance) {
         if (distance > 10000) {
-            return .3;
+            return .8;
         } else {
-            return .3 * distance / 10000;
+            return .8 * distance / 10000 + .2;
         }
     }
 
-    private void rotate(double theta) {
+    private void rotateTo(double theta) {
         // TODO: theta < 0
 
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
@@ -211,7 +230,6 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
             angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
             gyro = angles.firstAngle;
             for (DcMotor motor : motors) {
-                // TODO: use some decelerate function
                 motor.setPower(decelRotation(theta + gyro));
             }
             telemetry.addData("theta", theta);
@@ -221,15 +239,15 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
         for (DcMotor motor : motors) {
             motor.setPower(0);
         }
+        reset_gyro = gyro;
     }
 
     private double decelRotation(double theta) {
         if (Math.abs(theta) > 0.5) {
-            return .1;
+            return .8;
             //return Math.signum(theta);
         } else {
-            return .1;
-            //return theta / 0.5;
+            return .8 * theta / 0.5;
         }
     }
 
@@ -246,4 +264,11 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
     private int get_x() { return front_right_wheel.getCurrentPosition(); }
 
     private int get_y() { return -front_left_wheel.getCurrentPosition(); }
+
+    private boolean isYellow(ColorSensor sensor) {
+        float[] hsv = {0F, 0F, 0F};
+        Color.RGBToHSV(sensor.red() * 255, sensor.green() * 255, sensor.blue() * 255, hsv);
+        float hue = hsv[0];  // sat = hsv[1] and val = hsv[2]
+        return (hue < 90);
+    }
 }

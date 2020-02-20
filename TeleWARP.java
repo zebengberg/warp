@@ -32,7 +32,8 @@ public class TeleWARP extends LinearOpMode {
 
     private double current_gyro = 0.0;
     private double previous_gyro = 0.0;
-    private double reset_angle = 0.0;
+    private double reset_gyro = 0.0;
+    private double reset_theta = 0.0;
 
     private Servo left_arm;
     private Servo right_arm;
@@ -91,6 +92,11 @@ public class TeleWARP extends LinearOpMode {
         // Side-side encoder
         front_right_wheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         front_right_wheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+
+        // A boolean to decrease the slight bit of drift caused after gamepad rotates jellybean
+        // Can be deleted here and below without losing too much functionality
+        boolean is_user_rotating = false;
 
 
         // Servos for little arms
@@ -167,22 +173,26 @@ public class TeleWARP extends LinearOpMode {
                 current_gyro += 2 * Math.PI;
             }
             if (gamepad1.y) {
-                reset_angle = current_gyro;
+                reset_theta = current_gyro;
             }
 
             double user_rot = gamepad1.right_stick_x;
             double rotate;
-            if (Math.abs(user_rot) > 0.3) {
+            if (Math.abs(user_rot) > 0.2) {
                 rotate = user_rot * max_rot_power;
-                reset_angle = current_gyro;
+                reset_gyro = current_gyro;
+                is_user_rotating = true;
+            } else if (is_user_rotating) {  // user just let go
+                rotate = 0.0;
+                is_user_rotating = false;
             } else {
-                rotate = current_gyro - reset_angle;
+                rotate = current_gyro - reset_gyro;
             }
 
             // Dealing with velocity vector; all velocity controlled by left_stick.
             double x = gamepad1.left_stick_x * max_lin_power;
             double y = -gamepad1.left_stick_y * max_lin_power;
-            double theta = Math.atan2(y, x) - current_gyro;  // delete current_gyro from this line to steer relative to the robot front
+            double theta = Math.atan2(y, x) - current_gyro + reset_theta;  // delete current_gyro from this line to steer relative to the robot front
             double r = Math.sqrt(x * x + y * y);
 
             // (cos, sin) = ne(1, 1) + nw(-1, 1)
