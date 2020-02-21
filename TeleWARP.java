@@ -47,19 +47,13 @@ public class TeleWARP extends LinearOpMode {
     private boolean is_wrist_pressed = false;
     private boolean wrist_state = false;
 
+    private Servo capstone;
+    private boolean is_capstone_pressed = false;
+    private int capstone_state = 0;
+
     private DcMotor left_lift;
     private DcMotor right_lift;
 
-
-    // The lift has four different states
-    // State 0: all the way down in starting position
-    // State 1: at the apex above the block to be stacked
-    // State 2: down on top of the next block
-    // State 3: back up at the apex after block has been released
-    private boolean is_lift_pressed = false;
-    private int lift_state = 0;
-    private int lift_block_number = 0;
-    private int[] lift_targets = {100, 500, 900, 1300, 1700, 2100};
 
     private BNO055IMU imu;
 
@@ -117,6 +111,10 @@ public class TeleWARP extends LinearOpMode {
         left_platform.setPosition(0.0);
         right_platform.setPosition(0.0);
 
+        // Capstone servo
+        capstone = hardwareMap.servo.get("capstone");
+        capstone.setPosition(0.0);
+
 
         // Motors for big arm.
         left_lift = hardwareMap.dcMotor.get("left_lift");
@@ -132,9 +130,6 @@ public class TeleWARP extends LinearOpMode {
         wrist = hardwareMap.servo.get("wrist");
         wrist.setDirection(Servo.Direction.FORWARD);
         wrist.setPosition(0.0);
-
-
-
 
 
         // IMU DEVICE
@@ -253,6 +248,14 @@ public class TeleWARP extends LinearOpMode {
                 is_slow_pressed = false;
             }
 
+            // Toggle capstone
+            if ((gamepad1.dpad_up || gamepad1.dpad_down) && (!is_capstone_pressed)) {
+                is_capstone_pressed = true;
+                toggleCapstone(gamepad1.dpad_up);
+            } else if (!gamepad1.dpad_up) {
+                is_capstone_pressed = false;
+            }
+
             // Controlling the lift manually.
             if (gamepad1.right_trigger > 0) {
                 left_lift.setPower(gamepad1.right_trigger * 0.5);
@@ -264,14 +267,6 @@ public class TeleWARP extends LinearOpMode {
                 left_lift.setPower(0);
                 right_lift.setPower(0);
             }
-
-            // Controlling the lift automatically.
-            if (gamepad1.dpad_up && !is_lift_pressed) {
-                is_lift_pressed = true;
-                automateLift();
-            }else if (!gamepad1.dpad_up) {
-                is_lift_pressed = false;
-            }
         }
     }
 
@@ -279,59 +274,18 @@ public class TeleWARP extends LinearOpMode {
     private void printStatus() {
         telemetry.addData("forward-reverse encoder", front_left_wheel.getCurrentPosition());
         telemetry.addData("side-side encoder", front_right_wheel.getCurrentPosition());
-
         telemetry.addData("current gyro", current_gyro);
         telemetry.addData("previous gyro", previous_gyro);
-
         telemetry.addData("Left Arm ", left_arm.getPosition());
         telemetry.addData("Right Arm", right_arm.getPosition());
-
         telemetry.addData("Left lift position", left_lift.getCurrentPosition());
         telemetry.addData("Right lift position", right_lift.getCurrentPosition());
-
         telemetry.addData("wrist position", wrist.getPosition());
-
         telemetry.addData("left platform", left_platform.getPosition());
         telemetry.addData("right platform", right_platform.getPosition());
-
-        telemetry.addData("lift block number", lift_block_number);
+        telemetry.addData("capstone", capstone.getPosition());
 
         telemetry.update();
-    }
-
-
-
-    private void automateLift() {
-        left_lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        right_lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-
-        lift_state++;
-        lift_state %= 4;
-        int height = lift_targets[lift_block_number];
-        switch (lift_state) {
-            case 0:
-                left_lift.setTargetPosition(height);
-                right_lift.setTargetPosition(height);
-                break;
-            case 1:
-                left_lift.setTargetPosition(height - 50);
-                right_lift.setTargetPosition(height - 50);
-                break;
-            case 2:
-                left_lift.setTargetPosition(height);
-                right_lift.setTargetPosition(height);
-                break;
-            case 3:
-                left_lift.setTargetPosition(0);
-                right_lift.setTargetPosition(0);
-                lift_block_number++;
-                break;
-        }
-
-        while (left_lift.isBusy() && right_lift.isBusy()) {
-            idle();
-        }
     }
 
     private void togglePlatformGrabbers() {
@@ -363,6 +317,17 @@ public class TeleWARP extends LinearOpMode {
             max_lin_power = 1.0;
             max_rot_power = 0.5;
         }
+    }
+
+    private void toggleCapstone(boolean is_move_up) {
+        double[] capstone_states = {0.0, 0.2, 0.25, 0.3, 0.35, 0.4, 0.42, 0.44, 0.45};
+        if (is_move_up && (capstone_state < 8)) {
+            capstone_state++;
+        }
+        if ((!is_move_up) && (capstone_state > 0)) {
+            capstone_state--;
+        }
+        capstone.setPosition(capstone_states[capstone_state]);
     }
 
     private double decelRotation(double rotation) {

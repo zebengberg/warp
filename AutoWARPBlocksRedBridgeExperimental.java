@@ -24,9 +24,6 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
     private DcMotor[] motors;
     private BNO055IMU imu;
     private ColorSensor color_left;
-//    private ColorSensor color_left_mid;
-//    private ColorSensor color_right_mid;
-    private ColorSensor color_right;
 
 
     private double reset_gyro = 0.0;
@@ -60,9 +57,13 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
         Servo left_arm = hardwareMap.servo.get("left_arm");
         left_arm.setDirection(Servo.Direction.FORWARD);
         left_arm.setPosition(0.0);
-
         color_left = hardwareMap.get(ColorSensor.class, "color_left");
-        color_right = hardwareMap.get(ColorSensor.class,"color_left_mid");
+        Servo left_platform = hardwareMap.servo.get("left_platform");
+        Servo right_platform = hardwareMap.servo.get("right_platform");
+        left_platform.setDirection(Servo.Direction.REVERSE);
+        right_platform.setDirection(Servo.Direction.FORWARD);
+        left_platform.setPosition(0.0);
+        right_platform.setPosition(0.0);
 
 
 
@@ -96,7 +97,7 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
         telemetry.update();
 
 
-        telemetry.speak("jens jens jens jens jellybeans");
+        telemetry.speak("jen jen jen jellybeans jellybeans jellybeans jellybeans jellybeans jellybeans jellybeans jellybeans ");
 
         // wait for start button
         waitForStart();
@@ -105,50 +106,79 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
             moveTo(0, -23000);
 
             int block_count = 1;  // block_count will change to 1, 2, or 3
-            if (isYellow(color_left)) {
+            if (isYellow()) {
                 block_count++;
                 moveTo(6000, -23000);
-                if (isYellow(color_left)) {
+                if (isYellow()) {
                     block_count++;
                     moveTo(12000, -23000);
                 }
             }
 
             left_arm.setPosition(0.85);
-            sleep(1000);
+            sleep(700);
 
             moveTo((block_count - 1) * 6000, -14000);
             rotateTo(Math.PI / 2);
 
+            switch (block_count) {
+                case 1:
+                    // Moving across the fence
+                    moveTo(0, -40000);
+                    left_arm.setPosition(0.0);
 
-            // Moving across the fence
-            moveTo((block_count - 1) * 6000 + 3000, -55000);
-            left_arm.setPosition(0.0);
-            sleep(1000);
+                    // Moving to find the second block
+                    moveTo(0, -1000);
+                    rotateTo(0);
+                    moveTo(6000, -8000);
+
+                    // Grabbing second block
+                    left_arm.setPosition(.85);
+                    sleep(700);
+
+                    // Moving back across the fence
+                    moveTo(3000, 0);
+                    rotateTo(Math.PI / 2);
+                    moveTo(3000, -55000);
+                    rotateTo(Math.PI - 0.2);
+                    left_arm.setPosition(0);
+
+                    // Lining up with platform
+                    moveTo(10000, -55000);
+
+                    // Going to it
+                    moveTo(10000, -50000);
+
+                    // Grabbing platform
+                    left_platform.setPosition(0.3);
+                    right_platform.setPosition(0.3);
+                    sleep(300);
+
+                    // Dragging it
+                    moveTo(10000, -55000);
+                    rotateTo(-Math.PI / 2);
+
+                    // Pusing it forward
+                    moveTo(10000, -45000);
 
 
-            // Moving back to the find the second black
-            moveTo((block_count - 1) * 6000 + 3000, 0);
-            rotateTo(0);
-            // Moving slightly left
-            moveTo((block_count - 1) * 6000 + 8750, -5900);
 
+                    break;
 
-            // Grabbing it
-            left_arm.setPosition(.85);
-            sleep(1000);
+                case 2:
+                    // Moving across the fence
+                    moveTo(0, -46000);
+                    left_arm.setPosition(0.0);
 
+                    // Moving to find the second block
+                    moveTo(0, -1000);
+                    rotateTo(0);
+                    moveTo(5000, -8000);
 
-            moveTo((block_count - 1) * 6000 + 8750, 0);
-            rotateTo(Math.PI / 2);
-            moveTo((block_count - 1) * 6000, -55000);
+                case 3:
+                    break;
 
-            left_arm.setPosition(0);
-            sleep(1000);
-            rotateTo(- Math.PI / 2);
-            moveTo(0, 2000);
-
-
+            }
         }
     }
 
@@ -194,7 +224,7 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
             telemetry.addData("ne", ne);
             telemetry.addData("nw", nw);
             telemetry.update();
-        } while (((sign_x * (x - get_x()) > 100) || (sign_y * (y - get_y()) > 100)) && opModeIsActive());
+        } while (((sign_x * (x - get_x()) > 200) || (sign_y * (y - get_y()) > 200)) && opModeIsActive());
 
         for (DcMotor motor : motors) {
             motor.setPower(0);
@@ -203,10 +233,10 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
     }
 
     private double decelLinear(double distance) {
-        if (distance > 10000) {
+        if (distance > 5000) {
             return 1.0;
         } else {
-            return 0.8 * distance / 10000 + .2;
+            return 0.7 * distance / 5000 + .3;
         }
     }
 
@@ -233,7 +263,7 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
 
     private double decelRotation(double theta) {
         if (Math.abs(theta) > 0.8) {
-            return 0.7;
+            return 0.6;
         } else {
             return 0.2 * Math.abs(theta) / 0.8 + .2;
         }
@@ -253,9 +283,9 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
 
     private int get_y() { return -front_left_wheel.getCurrentPosition(); }
 
-    private boolean isYellow(ColorSensor sensor) {
+    private boolean isYellow() {
         float[] hsv = {0F, 0F, 0F};
-        Color.RGBToHSV(sensor.red() * 255, sensor.green() * 255, sensor.blue() * 255, hsv);
+        Color.RGBToHSV(color_left.red() * 255, color_left.green() * 255, color_left.blue() * 255, hsv);
         float hue = hsv[0];  // sat = hsv[1] and val = hsv[2]
         return (hue < 90);
     }
