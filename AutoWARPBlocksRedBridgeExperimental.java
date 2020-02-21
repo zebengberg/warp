@@ -23,6 +23,11 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
     private DcMotor front_right_wheel;
     private DcMotor[] motors;
     private BNO055IMU imu;
+    private ColorSensor color_left;
+//    private ColorSensor color_left_mid;
+//    private ColorSensor color_right_mid;
+    private ColorSensor color_right;
+
 
     private double reset_gyro = 0.0;
 
@@ -56,9 +61,9 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
         left_arm.setDirection(Servo.Direction.FORWARD);
         left_arm.setPosition(0.0);
 
-        Servo wrist = hardwareMap.servo.get("wrist");
-        wrist.setDirection(Servo.Direction.FORWARD);
-        wrist.setPosition(0.0);
+        color_left = hardwareMap.get(ColorSensor.class, "color_left");
+        color_right = hardwareMap.get(ColorSensor.class,"color_left_mid");
+
 
 
         // Motors for big arm.
@@ -96,70 +101,54 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
         // wait for start button
         waitForStart();
 
-        while (opModeIsActive()) {
-            moveTo(0, -24000);
+        if (opModeIsActive()) {
+            moveTo(0, -23000);
+
+            int block_count = 1;  // block_count will change to 1, 2, or 3
+            if (isYellow(color_left)) {
+                block_count++;
+                moveTo(6000, -23000);
+                if (isYellow(color_left)) {
+                    block_count++;
+                    moveTo(12000, -23000);
+                }
+            }
+
             left_arm.setPosition(0.85);
             sleep(1000);
-            moveTo(0, -17000);
+
+            moveTo((block_count - 1) * 6000, -14000);
             rotateTo(Math.PI / 2);
 
 
-            moveTo(0, -60000);
+            // Moving across the fence
+            moveTo((block_count - 1) * 6000 + 3000, -55000);
             left_arm.setPosition(0.0);
             sleep(1000);
-            moveTo(0, 0);
+
+
+            // Moving back to the find the second black
+            moveTo((block_count - 1) * 6000 + 3000, 0);
             rotateTo(0);
-            moveTo(-2000, -6000);
+            // Moving slightly left
+            moveTo((block_count - 1) * 6000 + 8750, -5900);
 
-            left_arm.setPosition(0.85);
+
+            // Grabbing it
+            left_arm.setPosition(.85);
             sleep(1000);
-            moveTo(0, 0);
+
+
+            moveTo((block_count - 1) * 6000 + 8750, 0);
             rotateTo(Math.PI / 2);
-            moveTo(0, -60000);
+            moveTo((block_count - 1) * 6000, -55000);
 
-            rotateTo(100);
-
-
-            //left_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            //right_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//            while (left_lift.isBusy() && right_lift.isBusy()) {
-//               left_lift.setPower(1.0);
-//                right_lift.setPower(1.0);
-//                telemetry.addData("left lift", left_lift.getCurrentPosition());
-//                telemetry.addData("right lift", right_lift.getCurrentPosition());
-//                telemetry.update();
-//            }
+            left_arm.setPosition(0);
+            sleep(1000);
+            rotateTo(- Math.PI / 2);
+            moveTo(0, 2000);
 
 
-
-
-
-//            sleep(2000);
-//            moveTo(55000, 26000);
-//            wrist.setPosition(0);
-//            moveTo(52443, 13000);
-//
-//            moveTo(-18139, -12950);
-//            moveTo(-18139, -23700);
-//            wrist.setPosition(1.0);
-//            moveTo(-18139, 12950);
-//            moveTo(62200, -12950);
-//
-//            moveTo(62200, -23700 );
-//            wrist.setPosition(0);
-//            sleep(500);
-////            left_platform.setPosition(1.0);
-////            right_platform.setPosition(1.0);
-//            sleep(500);
-//            moveTo(62200, 0);
-////            left_platform.setPosition(0.0);
-////            right_platform.setPosition(0.0);
-//            moveTo(0, 39200);
-//            moveTo(39200, -13264);
-//            moveTo(43427,-13264 );
-//            moveTo(43200, -13264);
-//            moveTo(43427, -22183);
-//            moveTo(21800, -22183);
         }
     }
 
@@ -205,7 +194,7 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
             telemetry.addData("ne", ne);
             telemetry.addData("nw", nw);
             telemetry.update();
-        } while ((sign_x * (x - get_x()) > 100) || (sign_y * (y - get_y()) > 100));
+        } while (((sign_x * (x - get_x()) > 100) || (sign_y * (y - get_y()) > 100)) && opModeIsActive());
 
         for (DcMotor motor : motors) {
             motor.setPower(0);
@@ -215,9 +204,9 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
 
     private double decelLinear(double distance) {
         if (distance > 10000) {
-            return .8;
+            return 1.0;
         } else {
-            return .8 * distance / 10000 + .2;
+            return 0.8 * distance / 10000 + .2;
         }
     }
 
@@ -226,11 +215,11 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
 
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
         double gyro = angles.firstAngle;
-        while(Math.abs(theta + gyro) > .1) {
+        while((Math.abs(theta + gyro) > .05) && opModeIsActive()) {
             angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
             gyro = angles.firstAngle;
             for (DcMotor motor : motors) {
-                motor.setPower(decelRotation(theta + gyro));
+                motor.setPower(decelRotation(theta + gyro) * Math.signum(theta + gyro));
             }
             telemetry.addData("theta", theta);
             telemetry.addData("gyro", gyro);
@@ -243,11 +232,10 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
     }
 
     private double decelRotation(double theta) {
-        if (Math.abs(theta) > 0.5) {
-            return .8;
-            //return Math.signum(theta);
+        if (Math.abs(theta) > 0.8) {
+            return 0.7;
         } else {
-            return .8 * theta / 0.5;
+            return 0.2 * Math.abs(theta) / 0.8 + .2;
         }
     }
 
@@ -272,3 +260,43 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
         return (hue < 90);
     }
 }
+
+
+
+// JENS CODE!
+
+//left_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//right_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            while (left_lift.isBusy() && right_lift.isBusy()) {
+//               left_lift.setPower(1.0);
+//                right_lift.setPower(1.0);
+//                telemetry.addData("left lift", left_lift.getCurrentPosition());
+//                telemetry.addData("right lift", right_lift.getCurrentPosition());
+//                telemetry.update();
+//            }
+//            sleep(2000);
+//            moveTo(55000, 26000);
+//            wrist.setPosition(0);
+//            moveTo(52443, 13000);
+//
+//            moveTo(-18139, -12950);
+//            moveTo(-18139, -23700);
+//            wrist.setPosition(1.0);
+//            moveTo(-18139, 12950);
+//            moveTo(62200, -12950);
+//
+//            moveTo(62200, -23700 );
+//            wrist.setPosition(0);
+//            sleep(500);
+////            left_platform.setPosition(1.0);
+////            right_platform.setPosition(1.0);
+//            sleep(500);
+//            moveTo(62200, 0);
+////            left_platform.setPosition(0.0);
+////            right_platform.setPosition(0.0);
+//            moveTo(0, 39200);
+//            moveTo(39200, -13264);
+//            moveTo(43427,-13264 );
+//            moveTo(43200, -13264);
+//            moveTo(43427, -22183);
+//            moveTo(21800, -22183);

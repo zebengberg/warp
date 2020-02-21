@@ -94,9 +94,9 @@ public class TeleWARP extends LinearOpMode {
         front_right_wheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
-        // A boolean to decrease the slight bit of drift caused after gamepad rotates jellybean
+        // An int to decrease the slight bit of drift caused after gamepad rotates jellybean
         // Can be deleted here and below without losing too much functionality
-        boolean is_user_rotating = false;
+        int is_user_rotating = 0;
 
 
         // Servos for little arms
@@ -181,10 +181,12 @@ public class TeleWARP extends LinearOpMode {
             if (Math.abs(user_rot) > 0.2) {
                 rotate = user_rot * max_rot_power;
                 reset_gyro = current_gyro;
-                is_user_rotating = true;
-            } else if (is_user_rotating) {  // user just let go
+                is_user_rotating = 0;
+            } else if (is_user_rotating < 10) {  // user just let go
                 rotate = 0.0;
-                is_user_rotating = false;
+                reset_gyro = current_gyro;
+                is_user_rotating++;
+
             } else {
                 rotate = current_gyro - reset_gyro;
             }
