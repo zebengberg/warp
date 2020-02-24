@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.warpcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -320,8 +320,8 @@ public class TeleWARP extends LinearOpMode {
     }
 
     private void toggleCapstone(boolean is_move_up) {
-        double[] capstone_states = {0.0, 0.2, 0.25, 0.3, 0.35, 0.4, 0.42, 0.44, 0.45};
-        if (is_move_up && (capstone_state < 8)) {
+        double[] capstone_states = {0.0, 0.2, 0.25, 0.3, 0.35, 0.4, 0.42, 0.44, 0.46, 0.42, 0.75};
+        if (is_move_up && (capstone_state < 10)) {
             capstone_state++;
         }
         if ((!is_move_up) && (capstone_state > 0)) {

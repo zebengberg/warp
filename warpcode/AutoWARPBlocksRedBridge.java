@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.warpcode;
 
 import android.graphics.Color;
 
@@ -14,9 +14,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-
 @Autonomous
-public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
+public class AutoWARPBlocksRedBridge extends LinearOpMode {
     private DcMotor front_left_wheel;
     private DcMotor back_left_wheel;
     private DcMotor back_right_wheel;
@@ -67,18 +66,6 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
 
 
 
-        // Motors for big arm.
-//        DcMotor left_lift = hardwareMap.dcMotor.get("left_lift");
-//        DcMotor right_lift = hardwareMap.dcMotor.get("right_lift");
-//        left_lift.setDirection(DcMotor.Direction.FORWARD);
-//        right_lift.setDirection(DcMotor.Direction.FORWARD);
-//        left_lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        right_lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        left_lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        right_lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-
-
         // IMU DEVICE
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.mode = BNO055IMU.SensorMode.IMU;
@@ -97,26 +84,28 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
         telemetry.update();
 
 
-        telemetry.speak("jen jen jen jellybeans jellybeans jellybeans jellybeans jellybeans jellybeans jellybeans jellybeans ");
+        telemetry.speak("jen jen jen jellybeans");
 
         // wait for start button
         waitForStart();
 
         if (opModeIsActive()) {
-            moveTo(0, -23000);
+            moveTo(0, -22000);
+            sleep(100);
 
             int block_count = 1;  // block_count will change to 1, 2, or 3
-            if (isYellow()) {
+            if (isYellow() || isYellow()) {  // taking two measurements?
                 block_count++;
                 moveTo(6000, -23000);
-                if (isYellow()) {
+                sleep(100);
+                if (isYellow() || isYellow()) {
                     block_count++;
                     moveTo(12000, -23000);
                 }
             }
 
-            left_arm.setPosition(0.85);
-            sleep(700);
+            left_arm.setPosition(0.87);
+            sleep(1200);
 
             moveTo((block_count - 1) * 6000, -14000);
             rotateTo(Math.PI / 2);
@@ -125,57 +114,144 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
                 case 1:
                     // Moving across the fence
                     moveTo(0, -40000);
-                    left_arm.setPosition(0.0);
+                    rotateTo(Math.PI / 2 + 0.3);
+                    left_arm.setPosition(0);
+                    sleep(300);
+                    rotateTo(Math.PI / 2 - 0.05);
 
                     // Moving to find the second block
                     moveTo(0, -1000);
                     rotateTo(0);
-                    moveTo(6000, -8000);
+                    moveTo(6000, -7000);
 
                     // Grabbing second block
-                    left_arm.setPosition(.85);
-                    sleep(700);
+                    sleep(100);
+                    left_arm.setPosition(0.87);
+                    sleep(800);
 
                     // Moving back across the fence
                     moveTo(3000, 0);
                     rotateTo(Math.PI / 2);
                     moveTo(3000, -55000);
                     rotateTo(Math.PI - 0.2);
+
+                    // Releasing second block
                     left_arm.setPosition(0);
+
+                    // Resetting IMU?
+                    parameters = new BNO055IMU.Parameters();
+                    parameters.mode = BNO055IMU.SensorMode.IMU;
+                    parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+                    parameters.loggingEnabled = false;
+                    imu = hardwareMap.get(BNO055IMU.class, "imu");
+                    imu.initialize(parameters);
+                    reset_gyro = 0.0;
 
                     // Lining up with platform
                     moveTo(10000, -55000);
 
                     // Going to it
-                    moveTo(10000, -50000);
+                    moveTo(10000, -45000);
 
                     // Grabbing platform
                     left_platform.setPosition(0.3);
                     right_platform.setPosition(0.3);
-                    sleep(300);
+                    sleep(500);
 
                     // Dragging it
-                    moveTo(10000, -55000);
-                    rotateTo(-Math.PI / 2);
+                    moveTo(5000, -65000);
+                    rotateTo(Math.PI / 2 + 0.4);
 
-                    // Pusing it forward
-                    moveTo(10000, -45000);
+                    // Releasing it
+                    left_platform.setPosition(0.0);
+                    right_platform.setPosition(0.0);
 
-
+                    // Moving under fence
+                    moveTo(10000, -25000);
 
                     break;
 
                 case 2:
                     // Moving across the fence
-                    moveTo(0, -46000);
+                    moveTo(8000, -46000);
                     left_arm.setPosition(0.0);
 
                     // Moving to find the second block
-                    moveTo(0, -1000);
+                    moveTo(8000, -1000);
                     rotateTo(0);
-                    moveTo(5000, -8000);
+                    moveTo(15300, -5000);
+
+
+                    // Grabbing second block
+                    left_arm.setPosition(.87);
+                    sleep(800);
+
+                    // Moving back across the fence
+                    moveTo(5000, 5000);
+                    rotateTo(Math.PI / 2);
+                    moveTo(10000, -40000);
+
+                    rotateTo(Math.PI - 0.2);
+
+
+                    // Releasing second block
+                    left_arm.setPosition(0);
+
+                    // Resetting IMU?
+                    parameters = new BNO055IMU.Parameters();
+                    parameters.mode = BNO055IMU.SensorMode.IMU;
+                    parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+                    parameters.loggingEnabled = false;
+                    imu = hardwareMap.get(BNO055IMU.class, "imu");
+                    imu.initialize(parameters);
+                    reset_gyro = 0.0;
+
+                    // Lining up with platform
+                    moveTo(28000, -40000);
+
+                    // Going to it
+                    moveTo(28000, -35000);
+
+                    // Grabbing platform
+                    left_platform.setPosition(0.3);
+                    right_platform.setPosition(0.3);
+                    sleep(500);
+
+                    // Dragging it
+                    moveTo(25000, -45000);
+                    rotateTo(Math.PI / 2 + 0.4);
+
+                    // Releasing it
+                    left_platform.setPosition(0.0);
+                    right_platform.setPosition(0.0);
+
+                    // Moving under fence
+                    moveTo(10000, -25000);
+
+                    break;
 
                 case 3:
+                    // Moving across the fence
+                    moveTo(13000, -52000);
+                    left_arm.setPosition(0.0);
+
+                    // Moving to find the second block
+                    moveTo(14000, -1000);
+                    rotateTo(0);
+                    moveTo(20000, -5000);
+
+                    // Grabbing second block
+                    left_arm.setPosition(.87);
+                    sleep(700);
+
+                    // Moving back across the fence
+                    moveTo(19000, 4000);
+                    rotateTo(Math.PI / 2);
+                    moveTo(16000, -48000);
+                    left_arm.setPosition(0);
+
+                    moveTo(16000, -35000);
+
                     break;
 
             }
@@ -191,6 +267,7 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
 
         int sign_x = Integer.signum(x - get_x());
         int sign_y = Integer.signum(y - get_y());
+        double start_time = time;
 
 
         do {
@@ -224,6 +301,10 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
             telemetry.addData("ne", ne);
             telemetry.addData("nw", nw);
             telemetry.update();
+            // Three second timeout in case robot gets stuck somewhere
+            if (time > start_time + 2) {
+                break;
+            }
         } while (((sign_x * (x - get_x()) > 200) || (sign_y * (y - get_y()) > 200)) && opModeIsActive());
 
         for (DcMotor motor : motors) {
@@ -233,16 +314,14 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
     }
 
     private double decelLinear(double distance) {
-        if (distance > 5000) {
+        if (distance > 8000) {
             return 1.0;
         } else {
-            return 0.7 * distance / 5000 + .3;
+            return 0.7 * distance / 8000 + .3;
         }
     }
 
     private void rotateTo(double theta) {
-        // TODO: theta < 0
-
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
         double gyro = angles.firstAngle;
         while((Math.abs(theta + gyro) > .05) && opModeIsActive()) {
@@ -287,46 +366,6 @@ public class AutoWARPBlocksRedBridgeExperimental extends LinearOpMode {
         float[] hsv = {0F, 0F, 0F};
         Color.RGBToHSV(color_left.red() * 255, color_left.green() * 255, color_left.blue() * 255, hsv);
         float hue = hsv[0];  // sat = hsv[1] and val = hsv[2]
-        return (hue < 90);
+        return (hue < 100);
     }
 }
-
-
-
-// JENS CODE!
-
-//left_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//right_lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//            while (left_lift.isBusy() && right_lift.isBusy()) {
-//               left_lift.setPower(1.0);
-//                right_lift.setPower(1.0);
-//                telemetry.addData("left lift", left_lift.getCurrentPosition());
-//                telemetry.addData("right lift", right_lift.getCurrentPosition());
-//                telemetry.update();
-//            }
-//            sleep(2000);
-//            moveTo(55000, 26000);
-//            wrist.setPosition(0);
-//            moveTo(52443, 13000);
-//
-//            moveTo(-18139, -12950);
-//            moveTo(-18139, -23700);
-//            wrist.setPosition(1.0);
-//            moveTo(-18139, 12950);
-//            moveTo(62200, -12950);
-//
-//            moveTo(62200, -23700 );
-//            wrist.setPosition(0);
-//            sleep(500);
-////            left_platform.setPosition(1.0);
-////            right_platform.setPosition(1.0);
-//            sleep(500);
-//            moveTo(62200, 0);
-////            left_platform.setPosition(0.0);
-////            right_platform.setPosition(0.0);
-//            moveTo(0, 39200);
-//            moveTo(39200, -13264);
-//            moveTo(43427,-13264 );
-//            moveTo(43200, -13264);
-//            moveTo(43427, -22183);
-//            moveTo(21800, -22183);

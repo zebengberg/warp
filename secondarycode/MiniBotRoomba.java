@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.secondarycode;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -11,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import java.util.Random;
 
 
-// TeleOp for minibot.
+// Auto for minibot.
 
 @Autonomous
 public class MiniBotRoomba extends LinearOpMode {
