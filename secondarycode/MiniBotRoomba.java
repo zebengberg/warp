@@ -5,23 +5,20 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.Random;
 
 
-// Auto for minibot.
-
-@Autonomous
+@Autonomous(name = "MiniBotRoomba", group = "MiniBot")
 public class MiniBotRoomba extends LinearOpMode {
 
-    private DcMotor left_motor;
-    private DcMotor right_motor;
+    private DcMotor left_motor, right_motor;
+    private DistanceSensor left_distance, right_distance;
+    private Servo left_arm, right_arm;
 
-
-    private DistanceSensor left_distance;
-    private DistanceSensor right_distance;
 
     @Override
     public void runOpMode() {
@@ -37,6 +34,13 @@ public class MiniBotRoomba extends LinearOpMode {
 
         left_distance = hardwareMap.get(DistanceSensor.class, "left_distance");
         right_distance = hardwareMap.get(DistanceSensor.class, "right_distance");
+
+        left_arm = hardwareMap.servo.get("left_arm");
+        right_arm = hardwareMap.servo.get("right_arm");
+        left_arm.setDirection(Servo.Direction.REVERSE);
+        right_arm.setDirection(Servo.Direction.FORWARD);
+        left_arm.setPosition(0.0);
+        right_arm.setPosition(0.0);
 
         waitForStart();
         while (opModeIsActive()) {
@@ -103,6 +107,15 @@ public class MiniBotRoomba extends LinearOpMode {
         }
         right_motor.setPower(0);
         left_motor.setPower(0);
+    }
+
+    private void claw() {
+        left_arm.setPosition(0.5);
+        sleep(500);
+        right_arm.setPosition(0.5);
+        left_arm.setPosition(0.0);
+        sleep(500);
+        right_arm.setPosition(0.0);
     }
 
     private void explore() {

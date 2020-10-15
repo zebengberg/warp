@@ -7,10 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 
-
-// TeleOp for minibot.
-
-@TeleOp
+@TeleOp(name = "MiniBot", group = "MiniBot")
 public class MiniBotDrive extends LinearOpMode {
 
     @Override
@@ -42,7 +39,7 @@ public class MiniBotDrive extends LinearOpMode {
 
             double y = -gamepad1.left_stick_y;
             if (y < 0) {
-                y /= 2; // slowing it down when reversing
+                y *= 0.8; // slowing it down when reversing
             }
             double x = gamepad1.right_stick_x;
 
@@ -60,13 +57,13 @@ public class MiniBotDrive extends LinearOpMode {
             right_motor.setPower(right_power);
 
             if (gamepad1.left_bumper) {
-                left_arm.setPosition(0.8);
+                left_arm.setPosition(0.75);
             } else {
                 left_arm.setPosition(0.0);
             }
 
             if (gamepad1.right_bumper) {
-                right_arm.setPosition(0.8);
+                right_arm.setPosition(0.85);
             } else {
                 right_arm.setPosition(0.0);
             }
